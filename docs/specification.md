@@ -1,42 +1,41 @@
-# カードスロット
-**ゲーム仕様書（vBeta.2）**
+# Card Slot
+**Game Specification (vBeta.3)**
 
 ---
 
-## 1. ゲーム概要
+## 1. Game Overview
 
-本ゲームは、スロットマシンの図柄をモチーフとしたカードを  
-3×3 のボード上に配置し、役を成立させることで効果を得ながら  
-勝利条件の達成を目指す、2人対戦型のボードゲームである。
+Card Slot is a two-player competitive board game inspired by slot machine symbols.
+Players place cards onto a 3×3 board, form lines (combinations), resolve their effects,
+and aim to achieve the win conditions.
 
-カード配置、役の選択、盤面管理、手札管理に加え、  
-**中央マス（9）を軸とした盤面制御**が重要となる。
-
----
-
-## 2. プレイ人数
-
-- 2人（固定）
+Strategic placement, hand management, and **control of the Center Slot (9)** are core elements of the game.
 
 ---
 
-## 3. 使用カード
+## 2. Players
 
-| 図柄 | 枚数 |
-|----|----|
-| 金色の7 | 5 |
-| 銀色の3 | 4 |
-| チェリー | 9 |
-| スイカ | 9 |
-| ベル | 15 |
+- Exactly 2 players
+
+---
+
+## 3. Cards
+
+| Symbol | Count |
+|------|------:|
+| Gold 7 | 5 |
+| Silver 3 | 4 |
+| Cherry | 9 |
+| Watermelon | 9 |
+| Bell | 15 |
 | REPLAY | 15 |
-| **合計** | **57枚** |
+| **Total** | **57** |
 
 ---
 
-## 4. ボード仕様
+## 4. Board
 
-### 4.1 マス構成
+### 4.1 Slot Layout
 
 ```
 +---+---+---+
@@ -48,158 +47,162 @@
 +---+---+---+
 ```
 
-### 4.2 ライン定義（全8ライン）
+### 4.2 Lines (8 Total)
 
-- 横： (1,2,3) / (8,9,4) / (7,6,5)
-- 縦： (1,8,7) / (2,9,6) / (3,4,5)
-- 斜め： (1,9,5) / (3,9,7)
-
----
-
-## 5. ゲーム準備
-
-1. 全カードをシャッフルする  
-2. 各プレイヤーに手札を9枚配る  
-3. 残りを裏向きで山札とする  
-4. 捨て札置き場を1か所用意する（捨て札は非公開）  
-5. **ジャンケン等で先攻プレイヤーを決定する**
+- Horizontal: (1,2,3) / (8,9,4) / (7,6,5)
+- Vertical: (1,8,7) / (2,9,6) / (3,4,5)
+- Diagonal: (1,9,5) / (3,9,7)
 
 ---
 
-## 6. ゲーム開始時の特別処理
+## 5. Setup
 
-### 6.1 中央マス初期配置
-
-- ゲーム開始時、**山札から中央マス（9）にはカードを置かない**
-- 先攻プレイヤーは、最初のターン開始時に  
-  **手札から任意のカード1枚を中央マス（9）に配置する**
-
-**制限**
-
-- 金色の7、銀色の3は中央マスに配置できない  
+1. Shuffle all cards to form the **Deck**
+2. Deal 9 cards to each player as their **Hand**
+3. Place the remaining cards face-down as the Deck
+4. Prepare a face-down **Discard Pile**
+5. Decide the first player by any fair method (e.g., Rock–Paper–Scissors)
 
 ---
 
-### 6.2 超特殊勝利条件（天和）
+## 6. Special Rules at Game Start
 
-- 配られた初期手札9枚が  
-  **金色の7：5枚、銀色の3：4枚**  
-  で構成されている場合、  
-  そのプレイヤーは**無条件で即勝利**とする  
+### 6.1 Center Slot Initialization
 
-※ 通常の勝利条件とは別枠の、極めて稀な勝利である。
+- No card is placed on the Center Slot (9) during setup
+- On the first player's first turn, they must place **one card from their Hand** onto Slot 9
 
----
+**Restrictions**
 
-## 7. ターン進行
-
-### 7.1 通常ターン
-
-1. 手札からカードを1枚選ぶ  
-2. ボード上の空いているマス1か所に配置する  
-   - 空きがない場合、中央以外の任意のマス1枚を捨て札にし、その後配置する  
-3. 役が成立している場合、成立している役の中から1つを選び解決する  
-4. ターン終了
+- Gold 7 and Silver 3 **cannot** be placed on the Center Slot
 
 ---
 
-## 8. 役と効果
+### 6.2 Heavenly Hand (Rare Instant Win)
 
-### 共通ルール
+If a player's initial Hand of 9 cards consists of:
 
-- 役を構成するカードは、効果解決前にすべて捨て札にする  
-- 効果で得たカードは即座に手札に加える  
-- **中央マス（9）のカードは、役の効果で選択・取得できない**  
-- 山札が0枚の場合、ドロー効果は発動しない  
+- Gold 7 × 5 cards
+- Silver 3 × 4 cards
 
----
+that player may **declare Heavenly Hand** and wins the game immediately.
 
-### 8.1 銀色の3（3枚揃い）【上位役】
-
-1. 成立した銀色の3をすべて捨て札にする  
-2. ボード上のカードから **最大2枚** を選び、手札に加える  
-
-**制限**
-
-- 中央マス（9）は選べない  
-- 選べるカードが存在しない場合、何も起こらない  
+- This declaration may be made regardless of turn order
+- This is an extremely rare win condition, separate from normal gameplay
 
 ---
 
-### 8.2 チェリー（3枚揃い）
+## 7. Turn Structure
 
-1. 成立したチェリーをすべて捨て札にする  
-2. ボード上のカードから **最大1枚** を選び、手札に加える  
+### 7.1 Normal Turn
 
-**制限**
-
-- 中央マス（9）は選べない  
-- 選べるカードが存在しない場合、何も起こらない  
-
----
-
-### 8.3 スイカ（3枚揃い）
-
-- 成立したスイカをすべて捨て札にする  
-- 山札の上から **2枚引く**
+1. Choose 1 card from your Hand
+2. Place it on any empty Slot on the Board
+   - If no Slots are empty, discard 1 non-center card from the Board to the Discard Pile, then place the card
+3. If any Lines are completed, choose **one** Line to resolve
+4. End the turn
 
 ---
 
-### 8.4 ベル（3枚揃い）
+## 8. Line Resolution Rules (Common)
 
-- 成立したベルをすべて捨て札にする  
-- 山札の上から **1枚引く**
-
----
-
-### 8.5 REPLAY（3枚揃い）
-
-- 成立したREPLAYをすべて捨て札にする  
-- 追加ターンを1回得る  
+- All cards forming the resolved Line are moved to the Discard Pile
+- Cards obtained by effects are immediately added to the Hand
+- Cards on the Center Slot (9) **cannot be selected or removed** by effects
+- If the Deck is empty, draw effects do not occur
 
 ---
 
-## 9. REPLAY追加ターン仕様
+## 9. Line Effects
 
-1. 山札の上から1枚引く  
-2. 空いているマスのうち、番号が最も小さいマスに配置する  
-3. 役効果は発動しない  
-4. REPLAYの連鎖は発生しない  
+### 9.1 Silver 3 (Three of a Kind) — High Tier
+
+1. Discard the resolved Silver 3 cards
+2. Select up to **2 cards** from the Board and add them to your Hand
+
+**Restrictions**
+
+- Center Slot (9) cannot be selected
+- If no valid cards exist, nothing happens
 
 ---
 
-## 10. 脱落ルール
+### 9.2 Cherry (Three of a Kind)
 
-- 手札が0枚になったプレイヤーは即脱落する  
+1. Discard the resolved Cherry cards
+2. Select up to **1 card** from the Board and add it to your Hand
+
+**Restrictions**
+
+- Center Slot (9) cannot be selected
+- If no valid cards exist, nothing happens
 
 ---
 
-## 11. 勝利条件
+### 9.3 Watermelon (Three of a Kind)
 
-### 11.1 即時勝利
+- Discard the resolved Watermelon cards
+- Draw **2 cards** from the top of the Deck
 
-- 自分の配置により **金色の7が3枚揃った場合**
+---
 
-### 11.2 山札枯渇時
+### 9.4 Bell (Three of a Kind)
 
-- 山札が0枚になったことが確定したターン終了時にゲーム終了  
-- 脱落していないプレイヤーのみ勝敗判定を行う  
+- Discard the resolved Bell cards
+- Draw **1 card** from the top of the Deck
 
-#### 手札点数
+---
 
-| カード | 点数 |
-|----|----|
-| 金色の7 | -1 |
-| 銀色の3 | -1 |
-| チェリー | 2 |
-| スイカ | 2 |
-| ベル | 1 |
+### 9.5 REPLAY (Three of a Kind)
+
+- Discard the resolved REPLAY cards
+- Resolve a **Replay Action**
+
+---
+
+## 10. Replay Action
+
+A Replay Action is **not a normal turn** and follows these rules:
+
+1. Draw the top card of the Deck
+2. Place it on the empty Slot with the **lowest slot number**
+3. No Line effects are evaluated
+4. Replay Actions do not chain or repeat
+
+---
+
+## 11. Elimination
+
+- A player with **0 cards in Hand** is immediately eliminated
+
+---
+
+## 12. Win Conditions
+
+### 12.1 Immediate Win
+
+- If a player forms **three Gold 7 cards in a Line**, that player wins immediately
+
+### 12.2 End of Deck
+
+- When the Deck reaches 0 cards, the game ends at the end of that turn
+- Only non-eliminated players are evaluated
+
+#### Hand Score
+
+| Card | Score |
+|------|------:|
+| Gold 7 | -1 |
+| Silver 3 | -1 |
+| Cherry | 2 |
+| Watermelon | 2 |
+| Bell | 1 |
 | REPLAY | 0 |
 
 ---
 
-## 12. 補足
+## 13. Notes
 
-- 中央マス（9）は本ゲームにおける最重要マスであり、  
-  初期配置・取得・制限はすべて意図的に設計されている。
-- 終盤では盤面管理と手札点数調整が重要となる。
+- The Center Slot (9) is the most strategically important Slot in the game
+- Its placement rules and restrictions are intentional and central to game balance
+- Endgame decisions often revolve around board control and hand score optimization
