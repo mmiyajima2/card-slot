@@ -27,8 +27,8 @@ Strategic placement, hand management, and **control of the Center Slot (9)** are
 | Silver 3 | 4 |
 | Cherry | 9 |
 | Watermelon | 9 |
-| Bell | 15 |
-| REPLAY | 15 |
+| Bell | 18 |
+| REPLAY | 12 |
 | **Total** | **57** |
 
 ---
