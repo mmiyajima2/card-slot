@@ -143,6 +143,7 @@ that player may **declare Heavenly Hand** and wins the game immediately.
 
 - Discard the resolved Watermelon cards
 - Draw **2 cards** from the top of the Deck
+- If no valid cards exist, nothing happens
 
 ---
 
@@ -150,6 +151,7 @@ that player may **declare Heavenly Hand** and wins the game immediately.
 
 - Discard the resolved Bell cards
 - Draw **1 card** from the top of the Deck
+- If no valid cards exist, nothing happens
 
 ---
 
