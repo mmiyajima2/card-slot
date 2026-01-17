@@ -1,5 +1,5 @@
 # Card Slot
-**Game Specification (vBeta.3)**
+**Game Specification (vBeta.4)**
 
 ---
 
@@ -10,6 +10,7 @@ Players place cards onto a 3×3 board, form lines (combinations), resolve their 
 and aim to achieve the win conditions.
 
 Strategic placement, hand management, and **control of the Center Slot (9)** are core elements of the game.
+In addition, **Slot 1** is treated as the second most important slot due to forced refresh rules.
 
 ---
 
@@ -37,7 +38,7 @@ Strategic placement, hand management, and **control of the Center Slot (9)** are
 
 ### 4.1 Slot Layout
 
-```
+```txt
 +---+---+---+
 | 1 | 2 | 3 |
 +---+---+---+
@@ -46,6 +47,7 @@ Strategic placement, hand management, and **control of the Center Slot (9)** are
 | 7 | 6 | 5 |
 +---+---+---+
 ```
+
 
 ### 4.2 Lines (8 Total)
 
@@ -94,7 +96,27 @@ that player may **declare Heavenly Hand** and wins the game immediately.
 
 ## 7. Turn Structure
 
-### 7.1 Normal Turn
+### 7.1 Forced Refresh Event (Before Player Action)
+
+If the Board is completely filled with cards at the start of a player's turn,
+the following event occurs **before** any player action:
+
+1. Discard the card in **Slot 1** to the Discard Pile
+2. Draw the top card of the Deck
+3. Place it onto the **Center Slot (9)**
+
+**Important Notes**
+
+- This is **not** a player action
+- No Line effects are evaluated, even if a Line is completed
+- Gold 7 and Silver 3 may be placed by this event
+- If the Deck is empty when this event would occur, the game ends immediately
+
+---
+
+### 7.2 Normal Turn
+
+After resolving the Forced Refresh Event (if any), the player performs a normal turn:
 
 1. Choose 1 card from your Hand
 2. Place it on any empty Slot on the Board
@@ -166,11 +188,11 @@ that player may **declare Heavenly Hand** and wins the game immediately.
 
 A Replay Action is **not a normal turn** and follows these rules:
 
-1. Draw the top card of the Deck\
-  - If the Deck is empty, the Replay Action ends immediately and no card is placed.
-3. Place it on the empty Slot with the **lowest slot number**
-4. No Line effects are evaluated
-5. Replay Actions do not chain or repeat
+1. Draw the top card of the Deck  
+   - If the Deck is empty, the Replay Action ends immediately and no card is placed.
+2. Place it on the empty Slot with the **lowest slot number**
+3. No Line effects are evaluated
+4. Replay Actions do not chain or repeat
 
 ---
 
@@ -188,7 +210,7 @@ A Replay Action is **not a normal turn** and follows these rules:
 
 ### 12.2 End of Deck
 
-- When the Deck reaches 0 cards, the game ends at the end of that turn
+- When the Deck reaches 0 cards, the game ends immediately
 - Only non-eliminated players are evaluated
 
 #### Hand Score
@@ -207,5 +229,6 @@ A Replay Action is **not a normal turn** and follows these rules:
 ## 13. Notes
 
 - The Center Slot (9) is the most strategically important Slot in the game
-- Its placement rules and restrictions are intentional and central to game balance
+- Slot 1 is the second most important Slot due to the Forced Refresh Event
+- These placement rules and restrictions are intentional and central to game balance
 - Endgame decisions often revolve around board control and hand score optimization
