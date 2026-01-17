@@ -103,7 +103,7 @@ the following event occurs **before** any player action:
 
 1. Discard the card in **Slot 1** to the Discard Pile
 2. Draw the top card of the Deck
-3. Place it onto the **Center Slot (9)**
+3. Place it onto the **Slot 1**
 
 **Important Notes**
 

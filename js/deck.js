@@ -1,4 +1,4 @@
-// 山札・捨て札
+// 山札
 (() => {
     "use strict";
 
@@ -35,7 +35,6 @@
     class Deck {
         constructor(cards) {
             this.cards = Array.isArray(cards) ? cards.slice() : [];
-            this.discardPile = [];
         }
 
         static createShuffledFullDeck() {
@@ -46,10 +45,6 @@
 
         get size() {
             return this.cards.length;
-        }
-
-        get discardSize() {
-            return this.discardPile.length;
         }
 
         isEmpty() {
@@ -63,15 +58,18 @@
             return this.cards.shift();
         }
 
-        discard(card) {
-            if (!card) {
-                return;
-            }
-            this.discardPile.push(card);
-        }
-
         shuffle() {
             shuffleInPlace(this.cards);
+        }
+
+        // すべてのカードを取得（読み取り専用のコピー）
+        getAllCards() {
+            return this.cards.slice();
+        }
+
+        // デバッグ用：山札の状態を文字列化
+        toString() {
+            return `Deck (${this.cards.length} cards remaining)`;
         }
     }
 
