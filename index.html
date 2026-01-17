@@ -1,11 +1,83 @@
 <!DOCTYPE html>
 <html lang="ja">
     <head>
-        <title>card-slot</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Card Slot</title>
+        <link rel="stylesheet" href="css/style.css">
     </head>
     <body>
-        <div>
-            <h1>...</h1>
+        <div id="app">
+            <h1>Card Slot</h1>
+            <p>ゲーム開発中... ブラウザのコンソールでテストできます。</p>
         </div>
+
+        <!-- JavaScriptファイルの読み込み（順序重要） -->
+        <script src="js/card.js"></script>
+        <script src="js/deck.js"></script>
+        <script src="js/board.js"></script>
+        <script src="js/hand.js"></script>
+        <script src="js/discardPile.js"></script>
+        <script src="js/gameState.js"></script>
+        <script src="js/effect.js"></script>
+        <script src="js/rules.js"></script>
+        <script src="js/main.js"></script>
+
+        <script>
+            // ステップ1のテスト用コード
+            console.log("=== Card Slot - Step 1 Test ===");
+
+            // 1. フルデッキの作成テスト
+            console.log("\n1. buildFullDeck() のテスト:");
+            const fullDeck = CardSlot.buildFullDeck();
+            console.log(`デッキ総枚数: ${fullDeck.length}枚 (期待値: 63枚)`);
+
+            // 各シンボルの枚数をカウント
+            const symbolCounts = {};
+            CardSlot.ORDERED_SYMBOLS.forEach(symbol => {
+                symbolCounts[symbol] = 0;
+            });
+
+            fullDeck.forEach(card => {
+                symbolCounts[card.symbol]++;
+            });
+
+            console.log("\n各シンボルの枚数:");
+            Object.entries(symbolCounts).forEach(([symbol, count]) => {
+                const def = CardSlot.getCardDefinition(symbol);
+                const expected = def.count;
+                const status = count === expected ? "✓" : "✗";
+                console.log(`${status} ${def.display}: ${count}枚 (期待値: ${expected}枚)`);
+            });
+
+            // 2. Deckクラスのテスト
+            console.log("\n2. Deck.createShuffledFullDeck() のテスト:");
+            const deck = CardSlot.Deck.createShuffledFullDeck();
+            console.log(`デッキサイズ: ${deck.size}枚`);
+            console.log(`デッキが空か: ${deck.isEmpty()}`);
+
+            // 3. ドローのテスト
+            console.log("\n3. ドロー機能のテスト:");
+            const drawnCard = deck.draw();
+            console.log(`ドローしたカード: ${drawnCard.toString()}`);
+            console.log(`ドロー後のデッキサイズ: ${deck.size}枚`);
+
+            // 4. 捨て札のテスト
+            console.log("\n4. 捨て札機能のテスト:");
+            deck.discard(drawnCard);
+            console.log(`捨て札パイルサイズ: ${deck.discardSize}枚`);
+
+            // 5. 複数枚ドローのテスト
+            console.log("\n5. 複数枚ドローのテスト:");
+            const hand = [];
+            for (let i = 0; i < 5; i++) {
+                hand.push(deck.draw());
+            }
+            console.log(`5枚ドロー後のデッキサイズ: ${deck.size}枚 (期待値: 57枚)`);
+            console.log("ドローした5枚:");
+            hand.forEach(card => console.log(`  - ${card.toString()}`));
+
+            console.log("\n=== テスト完了 ===");
+        </script>
     </body>
 </html>
