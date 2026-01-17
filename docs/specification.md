@@ -23,13 +23,13 @@ Strategic placement, hand management, and **control of the Center Slot (9)** are
 
 | Symbol | Count |
 |------|------:|
-| Gold 7 | 5 |
-| Silver 3 | 4 |
-| Cherry | 9 |
-| Watermelon | 9 |
-| Bell | 18 |
-| REPLAY | 12 |
-| **Total** | **57** |
+| Gold 7 | 8 |
+| Silver 3 | 5 |
+| Cherry | 8 |
+| Watermelon | 8 |
+| Bell | 21 |
+| REPLAY | 13 |
+| **Total** | **63** |
 
 ---
 
@@ -58,7 +58,7 @@ Strategic placement, hand management, and **control of the Center Slot (9)** are
 ## 5. Setup
 
 1. Shuffle all cards to form the **Deck**
-2. Deal 9 cards to each player as their **Hand**
+2. Deal 13 cards to each player as their **Hand**
 3. Place the remaining cards face-down as the Deck
 4. Prepare a face-down **Discard Pile**
 5. Decide the first player by any fair method (e.g., Rock–Paper–Scissors)
@@ -80,10 +80,10 @@ Strategic placement, hand management, and **control of the Center Slot (9)** are
 
 ### 6.2 Heavenly Hand (Rare Instant Win)
 
-If a player's initial Hand of 9 cards consists of:
+If a player's initial Hand of 13 cards consists of:
 
-- Gold 7 × 5 cards
-- Silver 3 × 4 cards
+- Gold 7 × 8 cards
+- Silver 3 × 5 cards
 
 that player may **declare Heavenly Hand** and wins the game immediately.
 
@@ -98,7 +98,7 @@ that player may **declare Heavenly Hand** and wins the game immediately.
 
 1. Choose 1 card from your Hand
 2. Place it on any empty Slot on the Board
-   - If no Slots are empty, discard 1 non-center card from the Board to the Discard Pile, then place the card
+   - If no Slots are empty, discard 1 non-center card of your choice from the Board to the Discard Pile, then place the card
 3. If any Lines are completed, choose **one** Line to resolve
 4. End the turn
 
@@ -166,10 +166,11 @@ that player may **declare Heavenly Hand** and wins the game immediately.
 
 A Replay Action is **not a normal turn** and follows these rules:
 
-1. Draw the top card of the Deck
-2. Place it on the empty Slot with the **lowest slot number**
-3. No Line effects are evaluated
-4. Replay Actions do not chain or repeat
+1. Draw the top card of the Deck\
+  - If the Deck is empty, the Replay Action ends immediately and no card is placed.
+3. Place it on the empty Slot with the **lowest slot number**
+4. No Line effects are evaluated
+5. Replay Actions do not chain or repeat
 
 ---
 
