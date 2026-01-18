@@ -20,7 +20,7 @@
     // +---+---+---+
     const SLOTS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
     const CENTER_SLOT = 9;
-    const FORCED_REFRESH_SLOT = 1;
+    const FORCED_REFRESH_SLOTS = [3, 7];
 
     // ライン定義（8本）
     const LINES = [
@@ -185,11 +185,17 @@
             );
         }
 
-        // 強制リフレッシュを実行（スロット1のカードを削除して新しいカードを配置）
-        forcedRefresh(newCard) {
-            const removedCard = this.removeCard(FORCED_REFRESH_SLOT);
+        // 強制リフレッシュを実行（スロット3と7のカードを削除して新しいカードを配置）
+        // @param {number} slotNumber - リフレッシュするスロット番号（3または7）
+        // @param {object} newCard - 配置する新しいカード
+        // @returns {object} 削除されたカード
+        forcedRefresh(slotNumber, newCard) {
+            if (!FORCED_REFRESH_SLOTS.includes(slotNumber)) {
+                throw new Error(`Invalid forced refresh slot: ${slotNumber}`);
+            }
+            const removedCard = this.removeCard(slotNumber);
             if (newCard) {
-                this.placeCard(FORCED_REFRESH_SLOT, newCard);
+                this.placeCard(slotNumber, newCard);
             }
             return removedCard;
         }
@@ -245,7 +251,7 @@
         Board,
         SLOTS,
         CENTER_SLOT,
-        FORCED_REFRESH_SLOT,
+        FORCED_REFRESH_SLOTS,
         LINES,
     };
 

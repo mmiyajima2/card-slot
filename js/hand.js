@@ -101,32 +101,6 @@
             return this.cards.reduce((total, card) => total + card.score, 0);
         }
 
-        // Heavenly Hand判定（Gold 7×8 + Silver 3×5）
-        isHeavenlyHand() {
-            if (this.cards.length !== 13) {
-                return false;
-            }
-
-            const gold7Count = this.countBySymbol(SYMBOLS.GOLD_7);
-            const silver3Count = this.countBySymbol(SYMBOLS.SILVER_3);
-
-            return gold7Count === 8 && silver3Count === 5;
-        }
-
-        // センタースロットに配置可能なカードを取得
-        getCardsPlaceableOnCenter() {
-            return this.cards.filter(
-                (card) =>
-                    card.symbol !== SYMBOLS.GOLD_7 &&
-                    card.symbol !== SYMBOLS.SILVER_3
-            );
-        }
-
-        // センタースロットに配置可能かどうか
-        hasCardsPlaceableOnCenter() {
-            return this.getCardsPlaceableOnCenter().length > 0;
-        }
-
         // 手札をソート（シンボル順）
         sortBySymbol() {
             const symbolOrder = [
