@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GameManager Test - Card Slot</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #00ff00;
+            text-shadow: 0 0 10px #00ff00;
+        }
+
+        .test-section {
+            background: #0a0a0a;
+            border: 2px solid #00ff00;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .test-section h2 {
+            color: #00ffff;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #00ff00;
+            padding-bottom: 5px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        button {
+            background: #003300;
+            color: #00ff00;
+            border: 2px solid #00ff00;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background: #00ff00;
+            color: #000;
+            box-shadow: 0 0 10px #00ff00;
+        }
+
+        button:disabled {
+            background: #111;
+            color: #333;
+            border-color: #333;
+            cursor: not-allowed;
+        }
+
+        .log-container {
+            background: #000;
+            border: 1px solid #00ff00;
+            border-radius: 5px;
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .log-entry {
+            margin-bottom: 8px;
+            padding: 5px;
+            border-left: 3px solid #00ff00;
+            padding-left: 10px;
+        }
+
+        .log-entry.event {
+            border-left-color: #00ffff;
+            color: #00ffff;
+        }
+
+        .log-entry.error {
+            border-left-color: #ff0000;
+            color: #ff0000;
+        }
+
+        .log-entry.success {
+            border-left-color: #00ff00;
+            color: #00ff00;
+        }
+
+        .state-display {
+            background: #000;
+            border: 1px solid #00ff00;
+            border-radius: 5px;
+            padding: 15px;
+            white-space: pre-wrap;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .board-display {
+            background: #000;
+            border: 1px solid #00ff00;
+            border-radius: 5px;
+            padding: 15px;
+            font-size: 14px;
+            line-height: 1.8;
+            font-family: 'Courier New', monospace;
+        }
+
+        .card-list {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .card-item {
+            background: #003300;
+            border: 1px solid #00ff00;
+            border-radius: 3px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .card-item:hover {
+            background: #00ff00;
+            color: #000;
+        }
+
+        .card-item.selected {
+            background: #00ff00;
+            color: #000;
+            box-shadow: 0 0 10px #00ff00;
+        }
+
+        .timestamp {
+            color: #666;
+            font-size: 10px;
+        }
+
+        .grid-2col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 1000px) {
+            .grid-2col {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 GameManager Test Console</h1>
+
+        <!-- Controls -->
+        <div class="test-section">
+            <h2>Controls</h2>
+            <div class="button-group">
+                <button id="btn-start-game">Start New Game</button>
+                <button id="btn-place-card" disabled>Place Card (Auto)</button>
+                <button id="btn-end-turn" disabled>End Turn</button>
+                <button id="btn-simulate-game" disabled>Simulate Full Game</button>
+                <button id="btn-clear-log">Clear Log</button>
+            </div>
+        </div>
+
+        <div class="grid-2col">
+            <!-- Game State -->
+            <div class="test-section">
+                <h2>Game State</h2>
+                <div id="state-display" class="state-display">
+                    No game started yet. Click "Start New Game" to begin.
+                </div>
+            </div>
+
+            <!-- Board -->
+            <div class="test-section">
+                <h2>Board</h2>
+                <div id="board-display" class="board-display">
+                    No game started yet.
+                </div>
+            </div>
+        </div>
+
+        <!-- Player Hands -->
+        <div class="grid-2col">
+            <div class="test-section">
+                <h2>Player 1 Hand</h2>
+                <div id="player1-hand" class="card-list">
+                    No cards yet.
+                </div>
+            </div>
+
+            <div class="test-section">
+                <h2>Player 2 Hand</h2>
+                <div id="player2-hand" class="card-list">
+                    No cards yet.
+                </div>
+            </div>
+        </div>
+
+        <!-- Event Log -->
+        <div class="test-section">
+            <h2>Event Log</h2>
+            <div id="event-log" class="log-container">
+                <div class="log-entry">Test console initialized. Ready to test GameManager.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScriptファイルの読み込み（順序重要） -->
+    <script src="js/card.js"></script>
+    <script src="js/deck.js"></script>
+    <script src="js/board.js"></script>
+    <script src="js/hand.js"></script>
+    <script src="js/discardPile.js"></script>
+    <script src="js/player.js"></script>
+    <script src="js/lineEffectResolver.js"></script>
+    <script src="js/gameManager.js"></script>
+
+    <script>
+        (() => {
+            'use strict';
+
+            let gameManager = null;
+            let selectedCard = null;
+
+            // DOM要素
+            const elements = {
+                btnStartGame: document.getElementById('btn-start-game'),
+                btnPlaceCard: document.getElementById('btn-place-card'),
+                btnEndTurn: document.getElementById('btn-end-turn'),
+                btnSimulateGame: document.getElementById('btn-simulate-game'),
+                btnClearLog: document.getElementById('btn-clear-log'),
+                stateDisplay: document.getElementById('state-display'),
+                boardDisplay: document.getElementById('board-display'),
+                player1Hand: document.getElementById('player1-hand'),
+                player2Hand: document.getElementById('player2-hand'),
+                eventLog: document.getElementById('event-log')
+            };
+
+            // ログに追加
+            function addLog(message, type = 'info') {
+                const entry = document.createElement('div');
+                entry.className = `log-entry ${type}`;
+                const timestamp = new Date().toLocaleTimeString();
+                entry.innerHTML = `<span class="timestamp">[${timestamp}]</span> ${message}`;
+                elements.eventLog.appendChild(entry);
+                elements.eventLog.scrollTop = elements.eventLog.scrollHeight;
+            }
+
+            // UI更新
+            function updateUI() {
+                if (!gameManager) return;
+
+                // ゲーム状態表示
+                elements.stateDisplay.textContent = gameManager.toString();
+
+                // ボード表示
+                elements.boardDisplay.textContent = gameManager.board.toString();
+
+                // 手札表示
+                updateHandDisplay(0, elements.player1Hand);
+                updateHandDisplay(1, elements.player2Hand);
+
+                // ボタン状態
+                const isGameActive = gameManager.gamePhase !== 'ended';
+                elements.btnPlaceCard.disabled = !isGameActive;
+                elements.btnEndTurn.disabled = !isGameActive;
+                elements.btnSimulateGame.disabled = !isGameActive;
+            }
+
+            // 手札表示更新
+            function updateHandDisplay(playerIndex, container) {
+                const player = gameManager.players[playerIndex];
+                const isCurrent = gameManager.currentPlayerIndex === playerIndex;
+
+                container.innerHTML = '';
+
+                if (player.hand.isEmpty()) {
+                    container.textContent = 'No cards';
+                    return;
+                }
+
+                const cards = player.hand.getAllCards();
+                cards.forEach((card, index) => {
+                    const cardEl = document.createElement('div');
+                    cardEl.className = 'card-item';
+                    cardEl.textContent = `${card.symbol} (${card.score})`;
+
+                    if (isCurrent) {
+                        cardEl.addEventListener('click', () => {
+                            document.querySelectorAll('.card-item.selected').forEach(el => {
+                                el.classList.remove('selected');
+                            });
+                            cardEl.classList.add('selected');
+                            selectedCard = card;
+                            addLog(`Selected: ${card.symbol}`, 'info');
+                        });
+                    }
+
+                    container.appendChild(cardEl);
+                });
+            }
+
+            // イベントリスナー登録
+            function setupGameEvents() {
+                gameManager.on('gameStarted', (data) => {
+                    addLog(`🎮 Game Started - ${data.players.map(p => p.name).join(' vs ')}`, 'event');
+                    updateUI();
+                });
+
+                gameManager.on('firstTurnStarted', (data) => {
+                    addLog(`🎯 First Turn - ${data.currentPlayer} must place on Center Slot`, 'event');
+                });
+
+                gameManager.on('turnStarted', (data) => {
+                    addLog(`▶️ Turn Started - ${data.player} (Hand: ${data.handSize}, Deck: ${data.deckSize})`, 'event');
+                    updateUI();
+                });
+
+                gameManager.on('cardPlaced', (data) => {
+                    addLog(`🃏 Card Placed - ${data.player} placed ${data.card.symbol} on slot ${data.slot}`, 'success');
+                    updateUI();
+                });
+
+                gameManager.on('linesCompleted', (data) => {
+                    const lineInfo = data.lines.map(l => `${l.symbol} [${l.slots.join(',')}]`).join(', ');
+                    addLog(`✨ Lines Completed - ${data.count} line(s): ${lineInfo}`, 'event');
+                });
+
+                gameManager.on('lineResolved', (data) => {
+                    let msg = `⚡ Line Resolved - ${data.player} resolved ${data.symbol}`;
+                    if (data.instantWin) {
+                        msg += ' (INSTANT WIN!)';
+                    } else {
+                        msg += ` (Cards drawn: ${data.cardsDrawnFromDeck}, Cards from board: ${data.cardsAddedToHand})`;
+                    }
+                    addLog(msg, 'success');
+                    updateUI();
+                });
+
+                gameManager.on('forcedRefreshOccurred', (data) => {
+                    addLog(`🔄 Forced Refresh - Removed: ${data.removedCard?.symbol}, Placed: ${data.placedCard?.symbol}`, 'event');
+                    updateUI();
+                });
+
+                gameManager.on('playerEliminated', (data) => {
+                    addLog(`💀 Player Eliminated - ${data.player} (${data.reason})`, 'error');
+                });
+
+                gameManager.on('gameEnded', (data) => {
+                    const winner = data.winner || 'Draw';
+                    addLog(`🏁 Game Ended - Winner: ${winner} (${data.reason})`, 'success');
+                    updateUI();
+                });
+
+                gameManager.on('turnEnded', (data) => {
+                    addLog(`⏸️ Turn Ended - ${data.player}`, 'event');
+                });
+            }
+
+            // ゲーム開始
+            elements.btnStartGame.addEventListener('click', () => {
+                gameManager = new CardSlot.GameManager();
+                setupGameEvents();
+                gameManager.startGame('Alice', 'Bob');
+                selectedCard = null;
+                addLog('New game created', 'success');
+            });
+
+            // カード配置（自動）
+            elements.btnPlaceCard.addEventListener('click', () => {
+                if (!gameManager) return;
+
+                const currentPlayer = gameManager.getCurrentPlayer();
+                const card = selectedCard || currentPlayer.hand.getCard(0);
+
+                if (!card) {
+                    addLog('No card to place!', 'error');
+                    return;
+                }
+
+                // 配置可能なスロットを探す
+                let slot;
+                if (gameManager.gamePhase === 'firstTurn') {
+                    slot = 9; // センタースロット
+                } else {
+                    const emptySlots = gameManager.board.getEmptySlots();
+                    if (emptySlots.length > 0) {
+                        slot = emptySlots[0];
+                    } else {
+                        addLog('No empty slots!', 'error');
+                        return;
+                    }
+                }
+
+                try {
+                    const result = gameManager.placeCard(card, slot);
+
+                    // ライン完成があれば自動解決
+                    if (result.completedLines.length > 0) {
+                        const selectedLine = result.completedLines[0];
+                        gameManager.resolveLine(selectedLine);
+                    }
+
+                    selectedCard = null;
+                    updateUI();
+                } catch (error) {
+                    addLog(`Error: ${error.message}`, 'error');
+                }
+            });
+
+            // ターン終了
+            elements.btnEndTurn.addEventListener('click', () => {
+                if (!gameManager) return;
+                gameManager.endTurn();
+                selectedCard = null;
+            });
+
+            // ゲームシミュレーション
+            elements.btnSimulateGame.addEventListener('click', async () => {
+                if (!gameManager) return;
+
+                elements.btnSimulateGame.disabled = true;
+                addLog('Starting game simulation...', 'info');
+
+                const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+                while (gameManager.gamePhase !== 'ended') {
+                    const currentPlayer = gameManager.getCurrentPlayer();
+                    const card = currentPlayer.hand.getCard(0);
+
+                    if (!card) break;
+
+                    let slot;
+                    if (gameManager.gamePhase === 'firstTurn') {
+                        slot = 9;
+                    } else {
+                        const emptySlots = gameManager.board.getEmptySlots();
+                        if (emptySlots.length === 0) break;
+                        slot = emptySlots[Math.floor(Math.random() * emptySlots.length)];
+                    }
+
+                    try {
+                        const result = gameManager.placeCard(card, slot);
+
+                        if (result.completedLines.length > 0) {
+                            const selectedLine = result.completedLines[0];
+                            gameManager.resolveLine(selectedLine);
+                        }
+
+                        if (gameManager.gamePhase !== 'ended') {
+                            gameManager.endTurn();
+                        }
+
+                        await delay(500);
+                    } catch (error) {
+                        addLog(`Simulation error: ${error.message}`, 'error');
+                        break;
+                    }
+                }
+
+                addLog('Simulation complete!', 'success');
+            });
+
+            // ログクリア
+            elements.btnClearLog.addEventListener('click', () => {
+                elements.eventLog.innerHTML = '<div class="log-entry">Log cleared.</div>';
+            });
+
+            addLog('Test console ready. Click "Start New Game" to begin.', 'success');
+        })();
+    </script>
+</body>
+</html>
