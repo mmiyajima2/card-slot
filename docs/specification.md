@@ -143,6 +143,7 @@ If the Board is completely filled at the start of a turn:
 
 - Discard the resolved cards
 - Select up to 2 cards from the Board and add them to Hand
+- If no valid cards exist, nothing happens
 
 **Restrictions**
 
@@ -154,6 +155,7 @@ If the Board is completely filled at the start of a turn:
 
 - Discard the resolved cards
 - Select up to 1 card from the Board and add it to Hand
+- If no valid cards exist, nothing happens
 
 **Restrictions**
 
