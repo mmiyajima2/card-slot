@@ -226,7 +226,7 @@ A Replay Action is **not a normal turn** and follows these rules:
 
 ### 12.1 Immediate Win
 
-* If a player forms **three Gold 7 cards in a Line**, that player wins immediately
+* If a player forms **three Gold 7 cards in a Line**, that player wins immediately, even if the played card was their last card in Hand.
 
 ---
 
