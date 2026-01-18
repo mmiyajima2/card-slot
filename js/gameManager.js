@@ -11,6 +11,7 @@
     const {
         SYMBOLS,
         CENTER_SLOT,
+        FORCED_REFRESH_SLOTS,
         Deck,
         DiscardPile,
         Board,
@@ -162,37 +163,51 @@
 
         /**
          * Forced Refresh Eventを実行
+         * スロット3と7を順次リフレッシュする
          * @returns {object} 実行結果
          */
         _executeForcedRefreshEvent() {
-            // デッキが空ならゲーム終了
-            if (this.deck.isEmpty()) {
-                this._endGameByDeckEmpty();
-                return { occurred: true, gameEnded: true };
-            }
+            const refreshResults = [];
 
-            // デッキから1枚ドロー
-            const newCard = this.deck.draw();
+            // スロット3と7を順次リフレッシュ
+            for (const slotNumber of FORCED_REFRESH_SLOTS) {
+                // デッキが空になったら即座にゲーム終了
+                if (this.deck.isEmpty()) {
+                    this._endGameByDeckEmpty();
+                    return { occurred: true, gameEnded: true, refreshResults };
+                }
 
-            // スロット1をリフレッシュ
-            const removedCard = this.board.forcedRefresh(newCard);
+                // デッキから1枚ドロー
+                const newCard = this.deck.draw();
 
-            // 削除されたカードを捨て札に
-            if (removedCard) {
-                this.discardPile.add(removedCard);
+                // スロットをリフレッシュ
+                const removedCard = this.board.forcedRefresh(slotNumber, newCard);
+
+                // 削除されたカードを捨て札に
+                if (removedCard) {
+                    this.discardPile.add(removedCard);
+                }
+
+                refreshResults.push({
+                    slot: slotNumber,
+                    removedCard,
+                    placedCard: newCard
+                });
             }
 
             // イベント発火
             this.emit("forcedRefreshOccurred", {
-                removedCard: removedCard ? { symbol: removedCard.symbol } : null,
-                placedCard: newCard ? { symbol: newCard.symbol } : null,
+                refreshResults: refreshResults.map(r => ({
+                    slot: r.slot,
+                    removedCard: r.removedCard ? { symbol: r.removedCard.symbol } : null,
+                    placedCard: r.placedCard ? { symbol: r.placedCard.symbol } : null
+                })),
                 deckSize: this.deck.size
             });
 
             return {
                 occurred: true,
-                removedCard,
-                placedCard: newCard,
+                refreshResults,
                 gameEnded: false
             };
         }
