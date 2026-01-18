@@ -1,11 +1,76 @@
 <!DOCTYPE html>
 <html lang="ja">
     <head>
-        <title>card-slot</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Card Slot</title>
+        <link rel="stylesheet" href="css/style.css">
     </head>
     <body>
-        <div>
-            <h1>...</h1>
+        <div id="app">
+            <header>
+                <h1>Card Slot</h1>
+                <div id="game-info">
+                    <span id="current-player">Player 1's Turn</span>
+                    <span id="deck-count">Deck: 37</span>
+                </div>
+            </header>
+
+            <main id="game-area">
+                <!-- ボード (3x3グリッド) -->
+                <section id="board-section">
+                    <div id="board" class="board">
+                        <!-- スロット1-9がJSで動的に生成される -->
+                    </div>
+                </section>
+
+                <!-- プレイヤー情報 -->
+                <section id="players-section">
+                    <div id="player1-area" class="player-area">
+                        <h2>Player 1</h2>
+                        <div id="player1-hand" class="hand">
+                            <!-- Player 1の手札がここに表示される -->
+                        </div>
+                        <div id="player1-status" class="player-status">
+                            Hand: 13
+                        </div>
+                    </div>
+
+                    <div id="player2-area" class="player-area">
+                        <h2>Player 2</h2>
+                        <div id="player2-hand" class="hand">
+                            <!-- Player 2の手札がここに表示される -->
+                        </div>
+                        <div id="player2-status" class="player-status">
+                            Hand: 13
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ゲームメッセージ・ログ -->
+                <section id="message-section">
+                    <div id="game-log">
+                        <p>Game Start - Player 1, place a card on Center Slot (9)</p>
+                    </div>
+                </section>
+
+                <!-- アクションボタン -->
+                <section id="actions-section">
+                    <button id="btn-new-game">New Game</button>
+                    <button id="btn-end-turn" disabled>End Turn</button>
+                </section>
+            </main>
         </div>
+
+        <!-- JavaScriptファイルの読み込み（順序重要） -->
+        <script src="js/card.js"></script>
+        <script src="js/deck.js"></script>
+        <script src="js/board.js"></script>
+        <script src="js/hand.js"></script>
+        <script src="js/discardPile.js"></script>
+        <script src="js/player.js"></script>
+        <script src="js/lineEffectResolver.js"></script>
+        <script src="js/gameManager.js"></script>
+        <script src="js/main.js"></script>
     </body>
 </html>
