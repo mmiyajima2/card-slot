@@ -14,7 +14,7 @@
         }
 
         // カードを捨て札に追加
-        discard(card) {
+        add(card) {
             if (!card) {
                 return;
             }
@@ -22,7 +22,7 @@
         }
 
         // 複数のカードを捨て札に追加
-        discardMultiple(cards) {
+        addMultiple(cards) {
             if (!Array.isArray(cards)) {
                 return;
             }
