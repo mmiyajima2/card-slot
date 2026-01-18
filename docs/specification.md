@@ -11,7 +11,7 @@ Players place cards onto a 3×3 board, form lines (combinations), resolve their 
 and aim to achieve the win conditions.
 
 Strategic placement, hand management, and **control of the Center Slot (9)** are core elements of the game.
-In addition, **Slot 1** is treated as the second most important slot due to forced refresh rules.
+In addition, **Slots 3 and 7** are strategically important due to forced refresh rules.
 
 ---
 
@@ -101,20 +101,23 @@ that player may **declare Heavenly Hand** and wins the game immediately.
 If the Board is completely filled with cards at the start of a player's turn,
 the following event occurs **before** any player action:
 
-1. Discard the card in **Slot 1** to the Discard Pile
-2. Draw the top card of the Deck
-3. Place it onto **Slot 1**
+1. Discard the card in **Slot 3** to the Discard Pile  
+2. Draw the top card of the Deck  
+3. Place it onto **Slot 3**  
+4. Discard the card in **Slot 7** to the Discard Pile  
+5. Draw the top card of the Deck  
+6. Place it onto **Slot 7**
 
 **Important Notes**
 
 * This is **not** a player action
 * No Line effects are evaluated, even if a Line is completed
 * Gold 7 and Silver 3 may be placed by this event
-* If the Deck is empty when this event would occur, the game ends immediately
+* **If the Deck becomes empty at any point during this event, the game ends immediately**
 
 ---
 
-### 7.2 Normal Turn
+## 7.2 Normal Turn
 
 After resolving the Forced Refresh Event (if any), the player performs a normal turn:
 
@@ -226,13 +229,15 @@ A Replay Action is **not a normal turn** and follows these rules:
 
 ### 12.1 Immediate Win
 
-* If a player forms **three Gold 7 cards in a Line**, that player wins immediately, even if the played card was their last card in Hand.
+* If a player forms **three Gold 7 cards in a Line**, that player wins immediately,
+  even if the played card was their last card in Hand.
 
 ---
 
 ### 12.2 End of Deck
 
-* When the Deck reaches 0 cards, the game ends immediately
+* When the Deck reaches 0 cards, the game ends immediately  
+  *(at the moment it becomes 0)*
 * Only non-eliminated players are evaluated
 
 #### Hand Score
@@ -251,7 +256,7 @@ A Replay Action is **not a normal turn** and follows these rules:
 ## 13. Notes
 
 * The Center Slot (9) is the most strategically important Slot in the game
-* Slot 1 is the second most important Slot due to the Forced Refresh Event
+* **Slots 3 and 7** are strategically important due to the Forced Refresh Event
 * Resolving Lines is mandatory and central to maintaining game flow
 * In particular, REPLAY Lines may provide limited immediate benefit, but are essential to preventing board stagnation
 * These placement rules and restrictions are intentional and central to game balance
