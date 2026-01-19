@@ -155,7 +155,7 @@
 
         // 第1ターン開始イベント
         gameManager.on('firstTurnStarted', (data) => {
-            addLogMessage(`${data.currentPlayer}, place a card on Center Slot (9). Gold 7 and Silver 3 are not allowed.`, 'info');
+            addLogMessage(`${data.currentPlayer}, place a card on Center Slot (9). Rainbow 7 and Silver 3 are not allowed.`, 'info');
         });
 
         // カード配置イベント
@@ -216,7 +216,7 @@
         gameManager.on('gameEnded', (data) => {
             if (data.winner) {
                 const reasonMessages = {
-                    'gold_7_line': 'Gold 7 Line completed',
+                    'rainbow_7_line': 'Rainbow 7 Line completed',
                     'heavenly_hand': 'Heavenly Hand',
                     'opponent_eliminated': 'Opponent eliminated',
                     'deck_empty_survival': 'Last player standing',

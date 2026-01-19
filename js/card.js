@@ -4,7 +4,7 @@
 
     // カードシンボルの定義
     const SYMBOLS = {
-        GOLD_7: "GOLD_7",
+        RAINBOW_7: "RAINBOW_7",
         SILVER_3: "SILVER_3",
         CHERRY: "CHERRY",
         WATERMELON: "WATERMELON",
@@ -14,7 +14,7 @@
 
     // シンボルの順序（デッキ構築用）
     const ORDERED_SYMBOLS = [
-        SYMBOLS.GOLD_7,
+        SYMBOLS.RAINBOW_7,
         SYMBOLS.SILVER_3,
         SYMBOLS.CHERRY,
         SYMBOLS.WATERMELON,
@@ -24,12 +24,12 @@
 
     // 各カードの定義（枚数、スコア、SVG画像パス）
     const CARD_DEFINITIONS = {
-        [SYMBOLS.GOLD_7]: {
-            symbol: SYMBOLS.GOLD_7,
+        [SYMBOLS.RAINBOW_7]: {
+            symbol: SYMBOLS.RAINBOW_7,
             count: 5,
             score: -1,
-            display: "Gold 7",
-            image: "assets/gold_7.svg",
+            display: "Rainbow 7",
+            image: "assets/rainbow_7.svg",
         },
         [SYMBOLS.SILVER_3]: {
             symbol: SYMBOLS.SILVER_3,

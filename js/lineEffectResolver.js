@@ -42,8 +42,8 @@
                 replayCardPlaced: null,
             };
 
-            // Gold 7の即勝利判定
-            if (symbol === SYMBOLS.GOLD_7) {
+            // Rainbow 7の即勝利判定
+            if (symbol === SYMBOLS.RAINBOW_7) {
                 result.instantWin = true;
                 result.success = true;
                 // カードは捨て札には移動しない（ゲーム終了のため）
