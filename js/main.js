@@ -175,21 +175,21 @@
         // ライン解決イベント
         gameManager.on('lineResolved', (data) => {
             if (data.instantWin) {
-                addLogMessage(`${data.player} completed Gold 7 line and wins instantly!`, 'success');
-            } else {
-                addLogMessage(`${data.player} resolved ${data.symbol} line`, 'success');
-                if (data.cardsAddedToHand > 0) {
-                    addLogMessage(`+${data.cardsAddedToHand} card(s) added to hand`, 'info');
-                }
-                if (data.cardsDrawnFromDeck > 0) {
-                    addLogMessage(`+${data.cardsDrawnFromDeck} card(s) drawn from deck`, 'info');
-                }
-                if (data.replayActionExecuted) {
-                    if (data.replayCardPlaced) {
-                        addLogMessage(`REPLAY: Drew ${data.replayCardPlaced.card.symbol} and placed on Slot ${data.replayCardPlaced.slot}`, 'info');
-                    } else {
-                        addLogMessage(`REPLAY: No empty slot available`, 'info');
-                    }
+                // instantWinの場合はgameEndedイベントで表示するため、ここでは何もしない
+                return;
+            }
+            addLogMessage(`${data.player} resolved ${data.symbol} line`, 'success');
+            if (data.cardsAddedToHand > 0) {
+                addLogMessage(`+${data.cardsAddedToHand} card(s) added to hand`, 'info');
+            }
+            if (data.cardsDrawnFromDeck > 0) {
+                addLogMessage(`+${data.cardsDrawnFromDeck} card(s) drawn from deck`, 'info');
+            }
+            if (data.replayActionExecuted) {
+                if (data.replayCardPlaced) {
+                    addLogMessage(`REPLAY: Drew ${data.replayCardPlaced.card.symbol} and placed on Slot ${data.replayCardPlaced.slot}`, 'info');
+                } else {
+                    addLogMessage(`REPLAY: No empty slot available`, 'info');
                 }
             }
             updateUI();
@@ -215,7 +215,18 @@
         // ゲーム終了イベント
         gameManager.on('gameEnded', (data) => {
             if (data.winner) {
-                addLogMessage(`Game Over! ${data.winner} wins! (${data.reason})`, 'success');
+                const reasonMessages = {
+                    'gold_7_line': 'Gold 7 Line completed',
+                    'heavenly_hand': 'Heavenly Hand',
+                    'opponent_eliminated': 'Opponent eliminated',
+                    'deck_empty_survival': 'Last player standing',
+                    'deck_empty_score': 'Higher score',
+                    'deck_empty_no_winner': 'No winner',
+                    'deck_empty_draw': 'Draw'
+                };
+                const reasonText = reasonMessages[data.reason] || data.reason;
+                addLogMessage(`GAME OVER! ${data.winner} WINS!`, 'success');
+                addLogMessage(`Victory condition: ${reasonText}`, 'success');
             } else {
                 addLogMessage(`Game Over! Draw (${data.reason})`, 'info');
             }
