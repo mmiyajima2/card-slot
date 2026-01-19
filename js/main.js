@@ -22,6 +22,8 @@
     // ゲーム状態
     let gameState = {
         selectedCard: null,           // 現在選択中のカード
+        tentativePlacement: null,     // 仮配置 { card, slot }
+        awaitingConfirmation: false,  // 配置確定待ち
         awaitingLineSelection: false, // ライン選択待ち
         awaitingCardSelection: false, // カード選択待ち（Silver 3/Cherry）
         completedLines: [],           // 完成したライン一覧
@@ -56,6 +58,8 @@
 
             // アクションボタン
             btnNewGame: document.getElementById('btn-new-game'),
+            btnConfirmPlacement: document.getElementById('btn-confirm-placement'),
+            btnCancelPlacement: document.getElementById('btn-cancel-placement'),
             btnEndTurn: document.getElementById('btn-end-turn'),
 
             // モーダル: ライン選択
@@ -108,6 +112,12 @@
     function setupEventListeners() {
         // New Gameボタン
         elements.btnNewGame.addEventListener('click', handleNewGame);
+
+        // 配置確定ボタン
+        elements.btnConfirmPlacement.addEventListener('click', handleConfirmPlacement);
+
+        // 配置キャンセルボタン
+        elements.btnCancelPlacement.addEventListener('click', handleCancelPlacement);
 
         // End Turnボタン
         elements.btnEndTurn.addEventListener('click', handleEndTurn);
@@ -241,13 +251,24 @@
 
             const card = gameManager.board.getCard(slotNumber);
 
-            if (card) {
+            // 仮配置カードのチェック
+            const isTentative = gameState.tentativePlacement &&
+                               gameState.tentativePlacement.slot === slotNumber;
+
+            if (card || isTentative) {
                 slotElement.className = 'slot occupied';
                 if (slotNumber === CENTER_SLOT) {
                     slotElement.classList.add('center');
                 }
                 slotElement.innerHTML = '';
-                const cardElement = createCardElement(card);
+
+                const displayCard = isTentative ? gameState.tentativePlacement.card : card;
+                const cardElement = createCardElement(displayCard);
+
+                if (isTentative) {
+                    cardElement.classList.add('tentative');
+                }
+
                 cardElement.style.pointerEvents = 'none'; // ボード上のカードはクリック不可
                 slotElement.appendChild(cardElement);
             } else {
@@ -351,8 +372,17 @@
      * @param {object} state - ゲーム状態
      */
     function updateButtons(state) {
-        // End Turnボタン: ライン選択待ちでなく、ゲームが終了していなければ有効
-        if (state.phase === 'ended' || gameState.awaitingLineSelection || gameState.awaitingCardSelection) {
+        // Confirm Placementボタン: 仮配置中のみ有効
+        elements.btnConfirmPlacement.disabled = !gameState.awaitingConfirmation;
+
+        // Cancelボタン: 仮配置中のみ有効
+        elements.btnCancelPlacement.disabled = !gameState.awaitingConfirmation;
+
+        // End Turnボタン: 仮配置中、ライン選択待ち、ゲーム終了時は無効
+        if (state.phase === 'ended' ||
+            gameState.awaitingConfirmation ||
+            gameState.awaitingLineSelection ||
+            gameState.awaitingCardSelection) {
             elements.btnEndTurn.disabled = true;
         } else {
             elements.btnEndTurn.disabled = false;
@@ -381,6 +411,8 @@
 
         // ゲーム状態をリセット
         gameState.selectedCard = null;
+        gameState.tentativePlacement = null;
+        gameState.awaitingConfirmation = false;
         gameState.awaitingLineSelection = false;
         gameState.awaitingCardSelection = false;
         gameState.completedLines = [];
@@ -390,6 +422,68 @@
 
         // ゲーム開始
         gameManager.startGame('Player 1', 'Player 2');
+    }
+
+    /**
+     * 配置確定ハンドラ
+     */
+    function handleConfirmPlacement() {
+        if (!gameState.tentativePlacement) {
+            addLogMessage('No tentative placement to confirm', 'error');
+            return;
+        }
+
+        const { card, slot } = gameState.tentativePlacement;
+
+        try {
+            // GameManagerに反映（確定）
+            const result = gameManager.placeCard(card, slot);
+
+            // 仮配置状態をクリア
+            gameState.tentativePlacement = null;
+            gameState.awaitingConfirmation = false;
+
+            // プレイヤー敗北チェック（手札0枚）
+            if (result.playerEliminated) {
+                updateUI();
+                return;
+            }
+
+            // ライン完成チェック
+            if (result.completedLines.length === 0) {
+                // ライン完成なし → ターン終了可能
+                addLogMessage('Placement confirmed. You can end your turn.', 'success');
+            }
+            // ライン完成時はイベント経由でモーダルが表示される
+
+            // UI更新（ボタン状態を反映）
+            updateUI();
+
+        } catch (error) {
+            addLogMessage(`Error: ${error.message}`, 'error');
+            gameState.tentativePlacement = null;
+            gameState.awaitingConfirmation = false;
+            updateUI();
+        }
+    }
+
+    /**
+     * 配置キャンセルハンドラ
+     */
+    function handleCancelPlacement() {
+        if (!gameState.tentativePlacement) {
+            addLogMessage('No tentative placement to cancel', 'error');
+            return;
+        }
+
+        const { card } = gameState.tentativePlacement;
+
+        // 仮配置をキャンセル（カードは手札に戻る扱い）
+        gameState.tentativePlacement = null;
+        gameState.awaitingConfirmation = false;
+
+        updateUI();
+        addLogMessage(`Placement cancelled. ${card.display} returned to hand.`, 'info');
     }
 
     /**
@@ -418,6 +512,12 @@
 
         if (gameState.awaitingLineSelection || gameState.awaitingCardSelection) {
             addLogMessage('Please complete current action first', 'error');
+            return;
+        }
+
+        // 仮配置中の場合は警告
+        if (gameState.awaitingConfirmation) {
+            addLogMessage('Please confirm or cancel the current placement first', 'error');
             return;
         }
 
@@ -458,27 +558,18 @@
             return;
         }
 
-        try {
-            // カードを配置
-            const result = gameManager.placeCard(gameState.selectedCard, slotNumber);
-            clearSelectedCard();
+        // 仮配置状態にする（GameManagerには反映しない）
+        gameState.tentativePlacement = {
+            card: gameState.selectedCard,
+            slot: slotNumber
+        };
+        gameState.awaitingConfirmation = true;
 
-            // プレイヤー敗北チェック（手札0枚）
-            if (result.playerEliminated) {
-                return;
-            }
+        clearSelectedCard();
+        updateBoard();
+        updateButtons(state);
 
-            // ライン完成チェック
-            if (result.completedLines.length === 0) {
-                // ライン完成なし → ターン終了可能
-                addLogMessage('No lines completed. You can end your turn.', 'info');
-            }
-            // ライン完成時はイベント経由でモーダルが表示される
-
-        } catch (error) {
-            addLogMessage(`Error: ${error.message}`, 'error');
-            clearSelectedCard();
-        }
+        addLogMessage(`Card placed tentatively on Slot ${slotNumber}. Click "Confirm Placement" to finalize or "Cancel" to undo.`, 'info');
     }
 
     /**

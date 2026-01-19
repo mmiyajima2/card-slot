@@ -309,6 +309,18 @@ header h1 {
     font-size: 0.75rem;
 }
 
+/* 仮配置カードのスタイル */
+.slot .card.tentative {
+    opacity: 0.6;
+    border: 3px dashed var(--color-warning);
+    animation: tentativePulse 1.5s infinite;
+}
+
+@keyframes tentativePulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
 .slot.completed-line {
     animation: lineComplete 1s ease-in-out;
 }
@@ -403,6 +415,26 @@ header h1 {
 
 .btn-secondary:hover {
     background-color: #6b4596;
+}
+
+.btn-success {
+    background-color: var(--color-success);
+    color: white;
+}
+
+.btn-success:hover {
+    background-color: #27ae60;
+    box-shadow: 0 4px 12px rgba(46, 204, 113, 0.4);
+}
+
+.btn-warning {
+    background-color: var(--color-warning);
+    color: white;
+}
+
+.btn-warning:hover {
+    background-color: #e67e22;
+    box-shadow: 0 4px 12px rgba(243, 156, 18, 0.4);
 }
 
 .btn:disabled {
