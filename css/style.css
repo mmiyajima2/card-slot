@@ -203,40 +203,35 @@ header h1 {
     color: var(--color-text-dim);
 }
 
-/* カードシンボル別のカラー */
+.card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+}
+
+/* カードシンボル別のボーダーカラー */
 .card[data-symbol="GOLD_7"] {
-    background: linear-gradient(135deg, #ffd700, #ffed4e);
-    color: #000;
     border-color: var(--card-gold);
 }
 
 .card[data-symbol="SILVER_3"] {
-    background: linear-gradient(135deg, #c0c0c0, #e0e0e0);
-    color: #000;
     border-color: var(--card-silver);
 }
 
 .card[data-symbol="CHERRY"] {
-    background: linear-gradient(135deg, #e74c3c, #f78686);
-    color: #fff;
     border-color: var(--card-cherry);
 }
 
 .card[data-symbol="WATERMELON"] {
-    background: linear-gradient(135deg, #27ae60, #58d68d);
-    color: #fff;
     border-color: var(--card-watermelon);
 }
 
 .card[data-symbol="BELL"] {
-    background: linear-gradient(135deg, #f39c12, #f8c471);
-    color: #000;
     border-color: var(--card-bell);
 }
 
 .card[data-symbol="REPLAY"] {
-    background: linear-gradient(135deg, #3498db, #5dade2);
-    color: #fff;
     border-color: var(--card-replay);
 }
 

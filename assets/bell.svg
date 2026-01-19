@@ -4,12 +4,12 @@
 
   <!-- Gradients -->
   <defs>
-    <linearGradient id="bellGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+    <linearGradient id="bell-bellGradient" x1="0%" y1="0%" x2="0%" y2="100%">
       <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
       <stop offset="50%" style="stop-color:#FFA500;stop-opacity:1" />
       <stop offset="100%" style="stop-color:#FF8C00;stop-opacity:1" />
     </linearGradient>
-    <radialGradient id="highlight">
+    <radialGradient id="bell-highlight">
       <stop offset="0%" style="stop-color:#FFEB3B;stop-opacity:0.8" />
       <stop offset="100%" style="stop-color:#FFEB3B;stop-opacity:0" />
     </radialGradient>
@@ -17,7 +17,7 @@
 
   <!-- Bell body -->
   <path d="M 100 50 Q 80 50 70 80 L 70 120 Q 70 130 80 135 L 120 135 Q 130 130 130 120 L 130 80 Q 120 50 100 50 Z"
-        fill="url(#bellGradient)"
+        fill="url(#bell-bellGradient)"
         stroke="#8B4513"
         stroke-width="2"/>
 
@@ -26,7 +26,7 @@
   <circle cx="100" cy="40" r="5" fill="#8B4513"/>
 
   <!-- Highlight -->
-  <ellipse cx="85" cy="75" rx="15" ry="25" fill="url(#highlight)"/>
+  <ellipse cx="85" cy="75" rx="15" ry="25" fill="url(#bell-highlight)"/>
 
   <!-- Bell clapper -->
   <line x1="100" y1="135" x2="100" y2="150" stroke="#8B4513" stroke-width="3"/>

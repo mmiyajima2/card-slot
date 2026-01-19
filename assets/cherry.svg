@@ -4,12 +4,12 @@
 
   <!-- Gradients -->
   <defs>
-    <radialGradient id="cherryGradient">
+    <radialGradient id="cherry-cherryGradient">
       <stop offset="0%" style="stop-color:#FF1744;stop-opacity:1" />
       <stop offset="70%" style="stop-color:#D50000;stop-opacity:1" />
       <stop offset="100%" style="stop-color:#8B0000;stop-opacity:1" />
     </radialGradient>
-    <linearGradient id="stemGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+    <linearGradient id="cherry-stemGradient" x1="0%" y1="0%" x2="0%" y2="100%">
       <stop offset="0%" style="stop-color:#228B22;stop-opacity:1" />
       <stop offset="100%" style="stop-color:#006400;stop-opacity:1" />
     </linearGradient>
@@ -17,12 +17,12 @@
 
   <!-- Stems -->
   <path d="M 80 70 Q 70 50 75 35"
-        stroke="url(#stemGradient)"
+        stroke="url(#cherry-stemGradient)"
         stroke-width="4"
         fill="none"
         stroke-linecap="round"/>
   <path d="M 120 70 Q 130 50 125 35"
-        stroke="url(#stemGradient)"
+        stroke="url(#cherry-stemGradient)"
         stroke-width="4"
         fill="none"
         stroke-linecap="round"/>
@@ -31,10 +31,10 @@
   <ellipse cx="100" cy="40" rx="15" ry="8" fill="#228B22" opacity="0.8"/>
 
   <!-- Left cherry -->
-  <circle cx="75" cy="110" r="35" fill="url(#cherryGradient)"/>
+  <circle cx="75" cy="110" r="35" fill="url(#cherry-cherryGradient)"/>
   <ellipse cx="68" cy="95" rx="10" ry="8" fill="#FF6B6B" opacity="0.6"/>
 
   <!-- Right cherry -->
-  <circle cx="125" cy="110" r="35" fill="url(#cherryGradient)"/>
+  <circle cx="125" cy="110" r="35" fill="url(#cherry-cherryGradient)"/>
   <ellipse cx="118" cy="95" rx="10" ry="8" fill="#FF6B6B" opacity="0.6"/>
 </svg>

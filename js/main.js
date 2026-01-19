@@ -353,16 +353,13 @@
         cardElement.dataset.symbol = card.symbol;
         cardElement.dataset.cardId = card.id;
 
-        const symbolElement = document.createElement('div');
-        symbolElement.className = 'card-symbol';
-        symbolElement.textContent = card.display;
+        // SVG画像を表示
+        const imageElement = document.createElement('img');
+        imageElement.className = 'card-image';
+        imageElement.src = card.image;
+        imageElement.alt = card.display;
 
-        const scoreElement = document.createElement('div');
-        scoreElement.className = 'card-score';
-        scoreElement.textContent = `Score: ${card.score}`;
-
-        cardElement.appendChild(symbolElement);
-        cardElement.appendChild(scoreElement);
+        cardElement.appendChild(imageElement);
 
         return cardElement;
     }
