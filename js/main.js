@@ -184,6 +184,13 @@
                 if (data.cardsDrawnFromDeck > 0) {
                     addLogMessage(`+${data.cardsDrawnFromDeck} card(s) drawn from deck`, 'info');
                 }
+                if (data.replayActionExecuted) {
+                    if (data.replayCardPlaced) {
+                        addLogMessage(`REPLAY: Drew ${data.replayCardPlaced.card.symbol} and placed on Slot ${data.replayCardPlaced.slot}`, 'info');
+                    } else {
+                        addLogMessage(`REPLAY: No empty slot available`, 'info');
+                    }
+                }
             }
             updateUI();
         });

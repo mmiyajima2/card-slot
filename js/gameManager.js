@@ -397,6 +397,7 @@
                 cardsAddedToHand: result.cardsAddedToHand.length,
                 cardsDrawnFromDeck: result.cardsDrawnFromDeck.length,
                 replayActionExecuted: result.replayActionExecuted,
+                replayCardPlaced: result.replayCardPlaced,
                 handSize: currentPlayer.getHandSize(),
                 deckSize: this.deck.size
             });
