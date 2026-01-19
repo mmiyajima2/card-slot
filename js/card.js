@@ -26,14 +26,14 @@
     const CARD_DEFINITIONS = {
         [SYMBOLS.GOLD_7]: {
             symbol: SYMBOLS.GOLD_7,
-            count: 8,
+            count: 5,
             score: -1,
             display: "Gold 7",
             image: "assets/gold_7.svg",
         },
         [SYMBOLS.SILVER_3]: {
             symbol: SYMBOLS.SILVER_3,
-            count: 5,
+            count: 8,
             score: -1,
             display: "Silver 3",
             image: "assets/silver_3.svg",
@@ -41,7 +41,7 @@
         [SYMBOLS.CHERRY]: {
             symbol: SYMBOLS.CHERRY,
             count: 8,
-            score: 2,
+            score: 1,
             display: "Cherry",
             image: "assets/cherry.svg",
         },
@@ -61,7 +61,7 @@
         },
         [SYMBOLS.REPLAY]: {
             symbol: SYMBOLS.REPLAY,
-            count: 13,
+            count: 21,
             score: 0,
             display: "REPLAY",
             image: "assets/replay.svg",

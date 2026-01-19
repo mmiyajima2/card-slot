@@ -132,7 +132,7 @@
                 const gold7Count = player.hand.countBySymbol(SYMBOLS.GOLD_7);
                 const silver3Count = player.hand.countBySymbol(SYMBOLS.SILVER_3);
 
-                if (gold7Count === 8 && silver3Count === 5) {
+                if (gold7Count === 5 && silver3Count === 8) {
                     return player;
                 }
             }

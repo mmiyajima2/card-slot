@@ -1,5 +1,5 @@
 # Card Slot
-**Game Specification (v1.0.0)**
+**Game Specification (v1.0.1)**
 
 ---
 
@@ -24,13 +24,13 @@ In addition, **Slots 3 and 7** are strategically important due to forced refresh
 
 | Symbol     | Count |
 |------------|------:|
-| Gold 7     | 8 |
-| Silver 3   | 5 |
+| Gold 7     | 5 |
+| Silver 3   | 8 |
 | Cherry     | 8 |
 | Watermelon | 8 |
 | Bell       | 21 |
-| REPLAY     | 13 |
-| **Total**  | **63** |
+| REPLAY     | 21 |
+| **Total**  | **71** |
 
 ---
 
@@ -83,8 +83,8 @@ In addition, **Slots 3 and 7** are strategically important due to forced refresh
 
 If a player's initial Hand consists of:
 
-- Gold 7 × 8
-- Silver 3 × 5
+- Gold 7 ×5 
+- Silver 3 × 8 
 
 That player may immediately declare **Heavenly Hand** and win.
 
@@ -143,7 +143,7 @@ If the Board is completely filled at the start of a turn:
 
 - Discard the resolved cards
 - Select up to 2 cards from the Board and add them to Hand
-- If no valid cards exist, nothing happens
+- If no valid cards exist, the effect is skipped
 
 **Restrictions**
 
@@ -155,7 +155,7 @@ If the Board is completely filled at the start of a turn:
 
 - Discard the resolved cards
 - Select up to 1 card from the Board and add it to Hand
-- If no valid cards exist, nothing happens
+- If no valid cards exist, the effect is skipped
 
 **Restrictions**
 
@@ -232,7 +232,7 @@ If the Board is completely filled at the start of a turn:
 |------------|------:|
 | Gold 7     | -1 |
 | Silver 3   | -1 |
-| Cherry     | 2 |
+| Cherry     | 1 |
 | Watermelon | 2 |
 | Bell       | 1 |
 | REPLAY     | 0 |
