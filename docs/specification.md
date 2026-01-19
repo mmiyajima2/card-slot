@@ -24,7 +24,7 @@ In addition, **Slots 3 and 7** are strategically important due to forced refresh
 
 | Symbol     | Count |
 |------------|------:|
-| Gold 7     | 5 |
+| Rainbow 7     | 5 |
 | Silver 3   | 8 |
 | Cherry     | 8 |
 | Watermelon | 8 |
@@ -75,7 +75,7 @@ In addition, **Slots 3 and 7** are strategically important due to forced refresh
 
 **Restrictions**
 
-- Gold 7 and Silver 3 cannot be placed on Slot 9 during this initial placement
+- Rainbow 7 and Silver 3 cannot be placed on Slot 9 during this initial placement
 
 ---
 
@@ -83,7 +83,7 @@ In addition, **Slots 3 and 7** are strategically important due to forced refresh
 
 If a player's initial Hand consists of:
 
-- Gold 7 ×5 
+- Rainbow 7 ×5 
 - Silver 3 × 8 
 
 That player may immediately declare **Heavenly Hand** and win.
@@ -105,7 +105,7 @@ If the Board is completely filled at the start of a turn:
 
 - This is not a player action
 - No Line effects are evaluated
-- Gold 7 and Silver 3 may be placed
+- Rainbow 7 and Silver 3 may be placed
 - **If the Deck becomes empty at any point, the game ends immediately**
 
 ---
@@ -133,7 +133,7 @@ If the Board is completely filled at the start of a turn:
 
 - Slot 9 may become empty via Line resolution
 - Once empty, it is treated as a normal Slot
-- Gold 7 and Silver 3 may then be placed on Slot 9
+- Rainbow 7 and Silver 3 may then be placed on Slot 9
 
 ---
 
@@ -166,7 +166,7 @@ If the Board is completely filled at the start of a turn:
 ### 9.3 Watermelon (Three of a Kind)
 
 - Discard the resolved cards
-- Draw 2 cards from the Deck
+- Draw the top two cards from the Deck, one at a time.
 
 **Clarification**
 
@@ -179,7 +179,8 @@ If the Board is completely filled at the start of a turn:
 ### 9.4 Bell (Three of a Kind)
 
 - Discard the resolved cards
-- Draw 1 card from the Deck
+- Draw the top card of the Deck
+
 
 ---
 
@@ -216,7 +217,7 @@ If the Board is completely filled at the start of a turn:
 
 ### 12.1 Immediate Win
 
-- Forming three Gold 7 in a Line results in an immediate win
+- Forming three Rainbow 7 in a Line results in an immediate win
 - This is valid even if the final card was the last card in Hand
 
 ---
@@ -230,7 +231,7 @@ If the Board is completely filled at the start of a turn:
 
 | Card       | Score |
 |------------|------:|
-| Gold 7     | -1 |
+| Rainbow 7     | -1 |
 | Silver 3   | -1 |
 | Cherry     | 1 |
 | Watermelon | 2 |

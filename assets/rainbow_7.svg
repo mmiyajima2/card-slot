@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- Background -->
+  <rect width="200" height="200" fill="#1a1a1a" rx="10"/>
+
+  <!-- Rainbow gradient -->
+  <defs>
+    <linearGradient id="rainbow7-rainbowGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF0000;stop-opacity:1" />
+      <stop offset="16.67%" style="stop-color:#FF7F00;stop-opacity:1" />
+      <stop offset="33.33%" style="stop-color:#FFFF00;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#00FF00;stop-opacity:1" />
+      <stop offset="66.67%" style="stop-color:#0000FF;stop-opacity:1" />
+      <stop offset="83.33%" style="stop-color:#4B0082;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#9400D3;stop-opacity:1" />
+    </linearGradient>
+    <filter id="rainbow7-glow">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Number 7 -->
+  <text x="100" y="130"
+        font-family="Arial, sans-serif"
+        font-size="120"
+        font-weight="bold"
+        fill="url(#rainbow7-rainbowGradient)"
+        text-anchor="middle"
+        filter="url(#rainbow7-glow)"
+        stroke="#FFFFFF"
+        stroke-width="2">7</text>
+
+  <!-- Decorative rainbow stars -->
+  <circle cx="30" cy="30" r="4" fill="#FF0000" opacity="0.9"/>
+  <circle cx="170" cy="30" r="4" fill="#00FF00" opacity="0.9"/>
+  <circle cx="30" cy="170" r="4" fill="#0000FF" opacity="0.9"/>
+  <circle cx="170" cy="170" r="4" fill="#9400D3" opacity="0.9"/>
+</svg>

@@ -1,101 +1,164 @@
 # Card Slot
 **Survive First, Win Later**
 
-カード配置 × スロット要素を組み合わせた、オリジナルカードゲームです。  
-3×3 のボードにカードを配置し、役を成立させながら勝利を目指します。
+An original card game combining card placement mechanics with slot machine-style symbols.
+Place cards on a 3×3 board, form combinations, and aim for victory through strategic play.
 
-本リポジトリは、ゲームの **ルール仕様・実装・公開用コード** をまとめたものです。
-
----
-
-## 概要
-
-- ジャンル：カードゲーム／ボードゲーム
-- プレイ形式：1人プレー（CPU対戦）
-- プレイ時間：5〜10分程度
-- プラットフォーム：Webブラウザ（HTML / CSS / JavaScript）
-- マネタイズ：なし（非商用）
+This repository contains the **game rules, implementation, and web deployment code**.
 
 ---
 
-## ゲームの特徴
+## Overview
 
-- スロット風の「役」をカード配置で再現
-- 3×3 ボードによる戦略的な配置
-- 山札管理・役選択による駆け引き
-- REPLAYによる追加ターン要素
-
-※ 本作は既存のパチスロ機や実在のゲームを再現したものではなく、  
-　**オリジナルルールのゲーム**です。
+- **Genre:** Card Game / Board Game
+- **Players:** 2 players (Human vs Human or CPU)
+- **Play Time:** 5-10 minutes
+- **Platform:** Web Browser (HTML / CSS / JavaScript)
+- **Monetization:** None (Non-commercial)
 
 ---
 
-## 公開状況
+## Game Features
 
-- Web版：準備中
-- 目的：
-  - 実際に第三者に遊んでもらう
-  - フィードバック（レビュー）を集め、改善する
+- **Slot-Inspired Combinations:** Form lines with matching card symbols
+- **3×3 Strategic Board:** Tactical placement with center slot importance
+- **Deck Management:** Draw, hand management, and discard pile mechanics
+- **Line Effect Resolution:** Choose which completed line to resolve
+- **REPLAY Mechanics:** Chain actions for additional card placements
+- **Rainbow 7 Victory:** Instant win condition with three Rainbow 7s in a line
 
 ---
 
-## ルール・仕様
+## Key Mechanics
 
-ゲームの詳細なルールは、以下を参照してください。
+### Cards (71 Total)
+- **Rainbow 7** (5 cards): Rare card with instant win condition, negative score
+- **Silver 3** (8 cards): Powerful board control effect
+- **Cherry** (8 cards): Pick 1 card from board
+- **Watermelon** (8 cards): Draw 2 cards from deck
+- **Bell** (21 cards): Draw 1 card from deck
+- **REPLAY** (21 cards): Automatic placement on lowest empty slot
 
-- ゲーム仕様書（Beta）  
+### Victory Conditions
+1. **Rainbow 7 Line:** Three Rainbow 7 cards in a line (instant win)
+2. **Heavenly Hand:** Starting hand with 5 Rainbow 7s + 8 Silver 3s (instant win)
+3. **Opponent Elimination:** Opponent runs out of cards
+4. **Deck Exhaustion:** Higher hand score when deck is empty
+
+### Special Rules
+- **First Turn:** Must place on center slot (9), Rainbow 7 and Silver 3 forbidden
+- **Forced Refresh:** When board is full, slots 3 and 7 are automatically refreshed
+- **Center Slot Priority:** Slot 9 cannot be directly selected by card effects
+- **Mandatory Line Resolution:** Players must resolve completed lines even if disadvantageous
+
+---
+
+## Game Status
+
+- **Web Version:** In development
+- **Purpose:**
+  - Playable prototype for testing and feedback
+  - Iteration based on player reviews
+  - Balance and rule refinement
+
+---
+
+## Documentation
+
+Detailed game rules and specifications are available in:
+
+- **Game Specification (v1.0.1)**
   → `docs/specification.md`
 
-※ 仕様はプレイテストにより変更される可能性があります。
+※ Specifications are subject to change based on playtesting feedback.
 
 ---
 
-## 著作権・利用条件
+## How to Play
 
-### 著作権について
-
-- 本リポジトリに含まれる以下の内容は、作者に著作権があります。
-  - ゲーム仕様書の文章
-  - ソースコード
-  - UIデザイン
-  - 画像・素材（追加された場合）
-
-- ゲームの「アイデア」や「ルールの仕組み」自体は、  
-  著作権の保護対象ではありませんが、  
-  **本リポジトリに記載されている表現・実装は著作物です。**
+1. Open `index.html` in a modern web browser
+2. Click "New Game" to start
+3. Players alternate turns placing cards on the 3×3 board
+4. Complete lines (3 matching cards) to trigger effects
+5. Win by achieving Rainbow 7 line, eliminating opponent, or having higher score when deck is empty
 
 ---
 
-### 利用について
+## Technical Details
 
-- 個人利用・学習目的での閲覧・プレイは歓迎します。
-- **無断での商用利用・転載は禁止配布は禁止します。**
-- 改変・再配布を行う場合は、事前に作者へ連絡してください。
+### File Structure
+```
+card-slot/
+├── index.html          # Main game page
+├── css/
+│   └── style.css       # Game styling
+├── js/
+│   ├── card.js         # Card definitions and mechanics
+│   ├── deck.js         # Deck management
+│   ├── board.js        # Board state and logic
+│   ├── hand.js         # Hand management
+│   ├── player.js       # Player state
+│   ├── lineEffectResolver.js  # Line effect resolution
+│   ├── gameManager.js  # Core game logic
+│   └── main.js         # UI and event handling
+├── assets/
+│   └── *.svg           # Card graphics
+└── docs/
+    └── specification.md # Detailed game rules
+```
 
-※ 詳細は `LICENSE` ファイルを参照してください。
+### Technologies
+- Pure JavaScript (ES6+)
+- HTML5 / CSS3
+- SVG graphics for cards
+- No external dependencies
 
 ---
 
-## 作者
+## Copyright & License
 
-- 作者名：card-slot 開発者
-- 制作：個人開発
-- 本作は学習および創作活動の一環として制作されています。
+### Copyright
+The following content in this repository is copyrighted by the author:
+- Game specification documents
+- Source code
+- UI design
+- Graphics and assets
+
+While game mechanics and rules themselves are not subject to copyright,
+**the expression and implementation in this repository are protected works**.
+
+### Usage Terms
+- Personal use and learning purposes are welcome
+- **Commercial use and unauthorized distribution are prohibited**
+- For modification or redistribution, please contact the author in advance
+
+※ See `LICENSE` file for details.
 
 ---
 
-## 免責事項
+## Author
 
-- 本作を利用したことによるいかなる損害についても、作者は責任を負いません。
-- 予告なく仕様変更・公開停止を行う場合があります。
+- **Developer:** Card Slot Project
+- **Type:** Independent Development
+- **Contact:** mmiyajima2@gmail.com
 
----
-
-## フィードバック
-
-プレイ後の感想・改善点・バグ報告は歓迎します。  
-（公開後、レビュー用フォームへのリンクを設置予定です）
+This project is created as part of learning and creative activities.
 
 ---
 
-© Card Slot Project
+## Disclaimer
+
+- The author is not responsible for any damages resulting from the use of this game
+- Specifications may change or public access may be suspended without notice
+- This is an original game and does not reproduce any existing slot machines or commercial games
+
+---
+
+## Feedback
+
+Feedback, improvement suggestions, and bug reports are welcome!
+Please contact: mmiyajima2@gmail.com
+
+---
+
+© 2026 Card Slot Project

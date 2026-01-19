@@ -22,7 +22,7 @@
     --color-border: #444;
 
     /* カードカラー */
-    --card-gold: #ffd700;
+    --card-rainbow: #8b7da8;
     --card-silver: #c0c0c0;
     --card-cherry: #e74c3c;
     --card-watermelon: #27ae60;
@@ -211,8 +211,8 @@ header h1 {
 }
 
 /* カードシンボル別のボーダーカラー */
-.card[data-symbol="GOLD_7"] {
-    border-color: var(--card-gold);
+.card[data-symbol="RAINBOW_7"] {
+    border-color: var(--card-rainbow);
 }
 
 .card[data-symbol="SILVER_3"] {

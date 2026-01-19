@@ -129,7 +129,7 @@
          */
         _checkHeavenlyHand() {
             for (const player of this.players) {
-                const gold7Count = player.hand.countBySymbol(SYMBOLS.GOLD_7);
+                const gold7Count = player.hand.countBySymbol(SYMBOLS.RAINBOW_7);
                 const silver3Count = player.hand.countBySymbol(SYMBOLS.SILVER_3);
 
                 if (gold7Count === 5 && silver3Count === 8) {
@@ -264,13 +264,13 @@
                 return { valid: false, reason: "Card is required" };
             }
 
-            // 第1ターン：センタースロット必須、Gold 7/Silver 3禁止
+            // 第1ターン：センタースロット必須、Rainbow 7/Silver 3禁止
             if (this.gamePhase === "firstTurn") {
                 if (slot !== CENTER_SLOT) {
                     return { valid: false, reason: "First turn: must place on center slot" };
                 }
-                if (card.symbol === SYMBOLS.GOLD_7 || card.symbol === SYMBOLS.SILVER_3) {
-                    return { valid: false, reason: "Gold 7 and Silver 3 cannot be placed on center slot during first turn" };
+                if (card.symbol === SYMBOLS.RAINBOW_7 || card.symbol === SYMBOLS.SILVER_3) {
+                    return { valid: false, reason: "Rainbow 7 and Silver 3 cannot be placed on center slot during first turn" };
                 }
             }
 
@@ -318,9 +318,9 @@
 
             // 手札が0枚になったらチェック
             if (currentPlayer.hasEmptyHand()) {
-                // Gold 7ラインが揃っているかチェック（即勝利が優先）
-                const hasGold7Line = this.board.hasGold7Line();
-                if (!hasGold7Line) {
+                // Rainbow 7ラインが揃っているかチェック（即勝利が優先）
+                const hasRainbow7Line = this.board.hasRainbow7Line();
+                if (!hasRainbow7Line) {
                     // 手札0枚で敗北
                     currentPlayer.eliminate();
                     this.emit("playerEliminated", {
@@ -379,14 +379,14 @@
                 options
             );
 
-            // Gold 7の即勝利
+            // Rainbow 7の即勝利
             if (result.instantWin) {
                 this.emit("lineResolved", {
                     player: currentPlayer.name,
                     symbol: result.symbol,
                     instantWin: true
                 });
-                this.endGame(currentPlayer, "gold_7_line");
+                this.endGame(currentPlayer, "rainbow_7_line");
                 return result;
             }
 

@@ -104,7 +104,7 @@
         // 手札をソート（シンボル順）
         sortBySymbol() {
             const symbolOrder = [
-                SYMBOLS.GOLD_7,
+                SYMBOLS.RAINBOW_7,
                 SYMBOLS.SILVER_3,
                 SYMBOLS.CHERRY,
                 SYMBOLS.WATERMELON,

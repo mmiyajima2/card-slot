@@ -139,11 +139,11 @@
             return completedLines;
         }
 
-        // Gold 7が3枚揃っているラインがあるかどうか
-        hasGold7Line() {
+        // Rainbow 7が3枚揃っているラインがあるかどうか
+        hasRainbow7Line() {
             const completedLines = this.getCompletedLines();
             return completedLines.some(
-                (line) => line.symbol === SYMBOLS.GOLD_7
+                (line) => line.symbol === SYMBOLS.RAINBOW_7
             );
         }
 
@@ -178,9 +178,9 @@
             if (!card) {
                 return false;
             }
-            // Gold 7とSilver 3はセンタースロットに配置できない
+            // Rainbow 7とSilver 3はセンタースロットに配置できない
             return (
-                card.symbol !== SYMBOLS.GOLD_7 &&
+                card.symbol !== SYMBOLS.RAINBOW_7 &&
                 card.symbol !== SYMBOLS.SILVER_3
             );
         }
@@ -218,8 +218,8 @@
                 const card = this.getCard(slot);
                 if (!card) return "   ";
                 switch (card.symbol) {
-                    case SYMBOLS.GOLD_7:
-                        return "G7 ";
+                    case SYMBOLS.RAINBOW_7:
+                        return "R7 ";
                     case SYMBOLS.SILVER_3:
                         return "S3 ";
                     case SYMBOLS.CHERRY:
