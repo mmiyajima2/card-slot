@@ -17,53 +17,90 @@
             </header>
 
             <main id="game-area">
-                <!-- ボード (3x3グリッド) -->
-                <section id="board-section">
-                    <div id="board" class="board">
-                        <!-- スロット1-9がJSで動的に生成される -->
-                    </div>
-                </section>
-
-                <!-- プレイヤー情報 -->
-                <section id="players-section">
-                    <div id="player1-area" class="player-area">
-                        <h2>Player 1</h2>
+                <div class="game-container">
+                    <!-- Player 1 Area (上部) -->
+                    <section id="player1-area" class="player-area">
+                        <div class="player-header">
+                            <h2>Player 1</h2>
+                            <div id="player1-status" class="player-status">
+                                <span class="hand-count">Hand: 13</span>
+                                <span class="score">Score: 0</span>
+                            </div>
+                        </div>
                         <div id="player1-hand" class="hand">
                             <!-- Player 1の手札がここに表示される -->
                         </div>
-                        <div id="player1-status" class="player-status">
-                            Hand: 13
-                        </div>
-                    </div>
+                    </section>
 
-                    <div id="player2-area" class="player-area">
-                        <h2>Player 2</h2>
+                    <!-- ボード (3x3グリッド) -->
+                    <section id="board-section">
+                        <div id="board" class="board">
+                            <!-- スロット1-9がJSで動的に生成される -->
+                        </div>
+                    </section>
+
+                    <!-- Player 2 Area (下部) -->
+                    <section id="player2-area" class="player-area">
+                        <div class="player-header">
+                            <h2>Player 2</h2>
+                            <div id="player2-status" class="player-status">
+                                <span class="hand-count">Hand: 13</span>
+                                <span class="score">Score: 0</span>
+                            </div>
+                        </div>
                         <div id="player2-hand" class="hand">
                             <!-- Player 2の手札がここに表示される -->
                         </div>
-                        <div id="player2-status" class="player-status">
-                            Hand: 13
+                    </section>
+                </div>
+
+                <!-- サイドバー: ゲームログとアクション -->
+                <aside id="sidebar">
+                    <!-- ゲームメッセージ・ログ -->
+                    <section id="message-section">
+                        <h3>Game Log</h3>
+                        <div id="game-log">
+                            <p>Click "New Game" to start</p>
                         </div>
-                    </div>
-                </section>
+                    </section>
 
-                <!-- ゲームメッセージ・ログ -->
-                <section id="message-section">
-                    <div id="game-log">
-                        <p>Game Start - Player 1, place a card on Center Slot (9)</p>
-                    </div>
-                </section>
-
-                <!-- アクションボタン -->
-                <section id="actions-section">
-                    <button id="btn-new-game">New Game</button>
-                    <button id="btn-end-turn" disabled>End Turn</button>
-                </section>
+                    <!-- アクションボタン -->
+                    <section id="actions-section">
+                        <button id="btn-new-game" class="btn btn-primary">New Game</button>
+                        <button id="btn-confirm-placement" class="btn btn-success" disabled>Confirm Placement</button>
+                        <button id="btn-cancel-placement" class="btn btn-warning" disabled>Cancel</button>
+                        <button id="btn-end-turn" class="btn btn-secondary" disabled>End Turn</button>
+                    </section>
+                </aside>
             </main>
+
+            <!-- モーダル: ライン選択 -->
+            <div id="line-selection-modal" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <h3>Select a Line to Resolve</h3>
+                    <div id="line-options">
+                        <!-- ライン選択肢がJSで動的に生成される -->
+                    </div>
+                    <button id="btn-confirm-line" class="btn btn-primary">Confirm</button>
+                </div>
+            </div>
+
+            <!-- モーダル: カード選択 (Silver 3 / Cherry) -->
+            <div id="card-selection-modal" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <h3 id="card-selection-title">Select Cards from Board</h3>
+                    <p id="card-selection-instruction"></p>
+                    <div id="board-card-selection">
+                        <!-- 選択可能なカードがJSで動的に生成される -->
+                    </div>
+                    <button id="btn-confirm-cards" class="btn btn-primary">Confirm</button>
+                    <button id="btn-skip-cards" class="btn btn-secondary">Skip</button>
+                </div>
+            </div>
         </div>
 
         <!-- JavaScriptファイルの読み込み（順序重要） -->
-        <script src="js/card.js"></script>
+        <script src="js/card.js?v=2"></script>
         <script src="js/deck.js"></script>
         <script src="js/board.js"></script>
         <script src="js/hand.js"></script>
@@ -71,6 +108,6 @@
         <script src="js/player.js"></script>
         <script src="js/lineEffectResolver.js"></script>
         <script src="js/gameManager.js"></script>
-        <script src="js/main.js"></script>
+        <script src="js/main.js?v=2"></script>
     </body>
 </html>

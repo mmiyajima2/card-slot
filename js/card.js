@@ -22,43 +22,49 @@
         SYMBOLS.REPLAY,
     ];
 
-    // 各カードの定義（枚数、スコア）
+    // 各カードの定義（枚数、スコア、SVG画像パス）
     const CARD_DEFINITIONS = {
         [SYMBOLS.GOLD_7]: {
             symbol: SYMBOLS.GOLD_7,
-            count: 8,
+            count: 5,
             score: -1,
             display: "Gold 7",
+            image: "assets/gold_7.svg",
         },
         [SYMBOLS.SILVER_3]: {
             symbol: SYMBOLS.SILVER_3,
-            count: 5,
+            count: 8,
             score: -1,
             display: "Silver 3",
+            image: "assets/silver_3.svg",
         },
         [SYMBOLS.CHERRY]: {
             symbol: SYMBOLS.CHERRY,
             count: 8,
-            score: 2,
+            score: 1,
             display: "Cherry",
+            image: "assets/cherry.svg",
         },
         [SYMBOLS.WATERMELON]: {
             symbol: SYMBOLS.WATERMELON,
             count: 8,
             score: 2,
             display: "Watermelon",
+            image: "assets/watermelon.svg",
         },
         [SYMBOLS.BELL]: {
             symbol: SYMBOLS.BELL,
             count: 21,
             score: 1,
             display: "Bell",
+            image: "assets/bell.svg",
         },
         [SYMBOLS.REPLAY]: {
             symbol: SYMBOLS.REPLAY,
-            count: 13,
+            count: 21,
             score: 0,
             display: "REPLAY",
+            image: "assets/replay.svg",
         },
     };
 
@@ -86,6 +92,10 @@
 
         get score() {
             return this.definition.score;
+        }
+
+        get image() {
+            return this.definition.image;
         }
 
         toString() {
