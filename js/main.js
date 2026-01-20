@@ -30,7 +30,9 @@
         selectableSlots: [],          // 選択可能なスロット
         selectedSlots: [],            // 選択済みスロット
         selectedLine: null,           // 選択されたライン
-        maxSelectableCards: 0         // 最大選択可能カード数
+        maxSelectableCards: 0,        // 最大選択可能カード数
+        discardTargetSlot: null,      // 捨てる予定のスロット番号
+        discardTargetCard: null       // 捨てる予定のカード
     };
 
     /**
@@ -72,7 +74,13 @@
             cardSelectionInstruction: document.getElementById('card-selection-instruction'),
             boardCardSelection: document.getElementById('board-card-selection'),
             btnConfirmCards: document.getElementById('btn-confirm-cards'),
-            btnSkipCards: document.getElementById('btn-skip-cards')
+            btnSkipCards: document.getElementById('btn-skip-cards'),
+
+            // モーダル: 捨てカード確認
+            discardConfirmModal: document.getElementById('discard-confirm-modal'),
+            discardConfirmMessage: document.getElementById('discard-confirm-message'),
+            btnConfirmDiscard: document.getElementById('btn-confirm-discard'),
+            btnCancelDiscard: document.getElementById('btn-cancel-discard')
         };
     }
 
@@ -126,6 +134,12 @@
 
         // カード選択スキップボタン
         elements.btnSkipCards.addEventListener('click', handleSkipCards);
+
+        // 捨てカード確定ボタン
+        elements.btnConfirmDiscard.addEventListener('click', handleConfirmDiscard);
+
+        // 捨てカードキャンセルボタン
+        elements.btnCancelDiscard.addEventListener('click', handleCancelDiscard);
     }
 
     /**
@@ -158,6 +172,11 @@
         gameManager.on('cardPlaced', (data) => {
             addLogMessage(`${data.player} placed ${data.card.symbol} on Slot ${data.slot}`, 'success');
             updateUI();
+        });
+
+        // カード捨てイベント
+        gameManager.on('cardDiscarded', (data) => {
+            addLogMessage(`${data.player} discarded ${data.discardedCard.display} from Slot ${data.slot}`, 'info');
         });
 
         // ライン完成イベント
@@ -569,18 +588,40 @@
 
     /**
      * スロットクリックのハンドラ
+     * Board is full flow:
+     * 1) User clicks on a board slot (Slot 1-8 only, Slot 9 cannot be selected)
+     * 2) Confirmation dialog appears: "Discard [Card] from Slot X?"
+     * 3) If user confirms discard -> card is discarded, then user selects card from hand to place
+     *
      * @param {number} slotNumber - クリックされたスロット番号
      */
     function handleSlotClick(slotNumber) {
-        if (!gameState.selectedCard) {
-            addLogMessage('Please select a card from your hand first', 'error');
-            return;
-        }
-
         const state = gameManager.getGameState();
 
         if (state.phase === 'ended') {
             addLogMessage('Game has ended', 'error');
+            return;
+        }
+
+        // ボード満杯時の処理
+        if (gameManager.board.isFull()) {
+            // Slot 9（中央）は捨てられない
+            if (slotNumber === CENTER_SLOT) {
+                addLogMessage('Cannot discard center slot (Slot 9)', 'error');
+                return;
+            }
+
+            // 捨てカード確認ダイアログを表示
+            const card = gameManager.board.getCard(slotNumber);
+            if (card) {
+                showDiscardConfirmDialog(slotNumber, card);
+            }
+            return;
+        }
+
+        // 通常の配置フロー（ボード満杯でない場合）
+        if (!gameState.selectedCard) {
+            addLogMessage('Please select a card from your hand first', 'error');
             return;
         }
 
@@ -792,6 +833,65 @@
         } catch (error) {
             addLogMessage(`Error resolving line: ${error.message}`, 'error');
         }
+    }
+
+    /**
+     * 捨てカード確認ダイアログを表示
+     * @param {number} slotNumber - スロット番号
+     * @param {object} card - カードオブジェクト
+     */
+    function showDiscardConfirmDialog(slotNumber, card) {
+        gameState.discardTargetSlot = slotNumber;
+        gameState.discardTargetCard = card;
+
+        elements.discardConfirmMessage.textContent = `Discard ${card.display} from Slot ${slotNumber}?`;
+        elements.discardConfirmModal.style.display = 'flex';
+
+        addLogMessage(`Confirm to discard ${card.display} from Slot ${slotNumber}`, 'info');
+    }
+
+    /**
+     * 捨てカード確認ダイアログを閉じる
+     */
+    function hideDiscardConfirmDialog() {
+        elements.discardConfirmModal.style.display = 'none';
+        gameState.discardTargetSlot = null;
+        gameState.discardTargetCard = null;
+    }
+
+    /**
+     * 捨てカード確定ハンドラ
+     */
+    function handleConfirmDiscard() {
+        if (!gameState.discardTargetSlot) {
+            addLogMessage('No slot selected for discard', 'error');
+            return;
+        }
+
+        try {
+            // スロットのカードを捨て札に移動
+            const result = gameManager.discardCardFromSlot(gameState.discardTargetSlot);
+
+            // ダイアログを閉じる
+            hideDiscardConfirmDialog();
+
+            // UIを更新
+            updateUI();
+
+            // 手札から配置するカードを選択するよう促す
+            addLogMessage(`Slot ${gameState.discardTargetSlot} is now empty. Select a card from your hand to place.`, 'info');
+
+        } catch (error) {
+            addLogMessage(`Error: ${error.message}`, 'error');
+        }
+    }
+
+    /**
+     * 捨てカードキャンセルハンドラ
+     */
+    function handleCancelDiscard() {
+        hideDiscardConfirmDialog();
+        addLogMessage('Discard cancelled', 'info');
     }
 
     /**

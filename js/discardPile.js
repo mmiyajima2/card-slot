@@ -21,6 +21,11 @@
             this.cards.push(card);
         }
 
+        // カードを捨て札に追加（エイリアス）
+        addCard(card) {
+            this.add(card);
+        }
+
         // 複数のカードを捨て札に追加
         addMultiple(cards) {
             if (!Array.isArray(cards)) {

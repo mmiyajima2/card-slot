@@ -361,6 +361,52 @@
             };
         }
 
+        /**
+         * ボード満杯時：スロットのカードを捨て札に移動（ボード満杯時の捨てカード処理）
+         * Board is full flow:
+         * 1) User clicks on a board slot (Slot 1-8 only, Slot 9 cannot be selected)
+         * 2) Confirmation dialog appears: "Discard [Card] from Slot X?"
+         * 3) If user confirms discard:
+         *    - Discard the card from that slot
+         *    - User then selects a card from hand to place on the now-empty slot
+         *
+         * @param {number} slot - スロット番号（1-8のみ）
+         * @returns {object} { success: boolean, discardedCard: object }
+         */
+        discardCardFromSlot(slot) {
+            // バリデーション
+            if (this.gamePhase === "ended") {
+                throw new Error("Game has ended");
+            }
+
+            if (slot === CENTER_SLOT) {
+                throw new Error("Cannot discard center slot (Slot 9)");
+            }
+
+            const card = this.board.getCard(slot);
+            if (!card) {
+                throw new Error(`Slot ${slot} is empty, cannot discard`);
+            }
+
+            // 捨て札に移動
+            this.discardPile.addCard(card);
+
+            // ボードから削除
+            this.board.removeCard(slot);
+
+            // イベント発火
+            this.emit("cardDiscarded", {
+                player: this.getCurrentPlayer().name,
+                slot,
+                discardedCard: { symbol: card.symbol, display: card.display }
+            });
+
+            return {
+                success: true,
+                discardedCard: card
+            };
+        }
+
         // ==================== ライン解決 ====================
 
         /**

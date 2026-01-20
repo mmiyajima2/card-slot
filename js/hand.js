@@ -36,6 +36,14 @@
             });
         }
 
+        // カードが手札に存在するかチェック
+        hasCard(card) {
+            if (!card) {
+                return false;
+            }
+            return this.cards.some((c) => c.id === card.id);
+        }
+
         // カードを削除（プレイ時）
         removeCard(card) {
             const index = this.cards.findIndex((c) => c.id === card.id);

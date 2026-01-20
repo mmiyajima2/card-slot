@@ -105,6 +105,20 @@
                     <button id="btn-skip-cards" class="btn btn-secondary">Skip</button>
                 </div>
             </div>
+
+            <!-- モーダル: ボード満杯時の捨てカード確認 -->
+            <div id="discard-confirm-modal" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <h3 id="discard-confirm-title">Discard Card</h3>
+                    <p id="discard-confirm-message">
+                        <!-- 動的に生成: Discard [Card] from Slot X? -->
+                    </p>
+                    <div class="modal-actions">
+                        <button id="btn-confirm-discard" class="btn btn-danger">Discard</button>
+                        <button id="btn-cancel-discard" class="btn btn-secondary">Cancel</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- JavaScriptファイルの読み込み（順序重要） -->
