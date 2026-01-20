@@ -181,10 +181,29 @@
 
         // ライン完成イベント
         gameManager.on('linesCompleted', (data) => {
-            addLogMessage(`${data.count} line(s) completed! Select one to resolve.`, 'success');
             gameState.completedLines = data.lines;
-            gameState.awaitingLineSelection = true;
-            showLineSelectionUI(data.lines);
+
+            // ラインが1つだけの場合は自動選択
+            if (data.count === 1) {
+                addLogMessage(`Line completed! Resolving ${data.lines[0].symbol}...`, 'success');
+                const selectedLine = data.lines[0];
+                gameState.selectedLine = selectedLine;
+
+                // Silver 3 / Cherryの場合、カード選択UIを表示
+                if (selectedLine.symbol === SYMBOLS.SILVER_3) {
+                    showCardSelectionUI(2, 'Silver 3: Select up to 2 cards from board');
+                } else if (selectedLine.symbol === SYMBOLS.CHERRY) {
+                    showCardSelectionUI(1, 'Cherry: Select up to 1 card from board');
+                } else {
+                    // それ以外はそのまま解決
+                    resolveSelectedLine({});
+                }
+            } else {
+                // 複数ラインの場合は選択モーダルを表示
+                addLogMessage(`${data.count} line(s) completed! Select one to resolve.`, 'success');
+                gameState.awaitingLineSelection = true;
+                showLineSelectionUI(data.lines);
+            }
         });
 
         // ライン解決イベント
