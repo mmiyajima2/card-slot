@@ -421,6 +421,11 @@
      * New Gameボタンのハンドラ
      */
     function handleNewGame() {
+        // Google Analytics イベント送信
+        if (globalThis.CardSlot && globalThis.CardSlot.Analytics) {
+            globalThis.CardSlot.Analytics.trackNewGame();
+        }
+
         // ゲームログをクリア
         elements.gameLog.innerHTML = '';
 
