@@ -60,7 +60,6 @@
             btnNewGame: document.getElementById('btn-new-game'),
             btnConfirmPlacement: document.getElementById('btn-confirm-placement'),
             btnCancelPlacement: document.getElementById('btn-cancel-placement'),
-            btnEndTurn: document.getElementById('btn-end-turn'),
 
             // モーダル: ライン選択
             lineSelectionModal: document.getElementById('line-selection-modal'),
@@ -118,9 +117,6 @@
 
         // 配置キャンセルボタン
         elements.btnCancelPlacement.addEventListener('click', handleCancelPlacement);
-
-        // End Turnボタン
-        elements.btnEndTurn.addEventListener('click', handleEndTurn);
 
         // ライン選択確定ボタン
         elements.btnConfirmLine.addEventListener('click', handleConfirmLine);
@@ -254,7 +250,7 @@
         updatePlayerArea(1, state.players[1]);
 
         // ボタン更新
-        updateButtons(state);
+        updateButtons();
     }
 
     /**
@@ -333,7 +329,9 @@
         // 手札更新
         const player = gameManager.players[playerIndex];
         if (player && player.hand) {
-            renderHand(handElement, player.hand.cards);
+            // 現在のターンのプレイヤーかどうかをチェック
+            const isCurrentPlayer = (state.currentPlayer === playerData.name && state.phase !== 'ended');
+            renderHand(handElement, player.hand.cards, isCurrentPlayer);
         }
     }
 
@@ -341,8 +339,9 @@
      * 手札を描画
      * @param {HTMLElement} handElement - 手札の親要素
      * @param {Array} cards - カード配列
+     * @param {boolean} isCurrentPlayer - 現在のターンのプレイヤーかどうか
      */
-    function renderHand(handElement, cards) {
+    function renderHand(handElement, cards, isCurrentPlayer) {
         handElement.innerHTML = '';
 
         if (cards.length === 0) {
@@ -355,7 +354,16 @@
 
         cards.forEach(card => {
             const cardElement = createCardElement(card);
-            cardElement.addEventListener('click', () => handleCardClick(card));
+
+            // 現在のターンのプレイヤーのみクリック可能
+            if (isCurrentPlayer) {
+                cardElement.addEventListener('click', () => handleCardClick(card));
+            } else {
+                cardElement.classList.add('disabled');
+                cardElement.style.pointerEvents = 'none';
+                cardElement.style.opacity = '0.6';
+            }
+
             handElement.appendChild(cardElement);
         });
     }
@@ -384,24 +392,13 @@
 
     /**
      * ボタンの有効/無効を更新
-     * @param {object} state - ゲーム状態
      */
-    function updateButtons(state) {
+    function updateButtons() {
         // Confirm Placementボタン: 仮配置中のみ有効
         elements.btnConfirmPlacement.disabled = !gameState.awaitingConfirmation;
 
         // Cancelボタン: 仮配置中のみ有効
         elements.btnCancelPlacement.disabled = !gameState.awaitingConfirmation;
-
-        // End Turnボタン: 仮配置中、ライン選択待ち、ゲーム終了時は無効
-        if (state.phase === 'ended' ||
-            gameState.awaitingConfirmation ||
-            gameState.awaitingLineSelection ||
-            gameState.awaitingCardSelection) {
-            elements.btnEndTurn.disabled = true;
-        } else {
-            elements.btnEndTurn.disabled = false;
-        }
     }
 
     /**
@@ -489,10 +486,12 @@
 
             // ライン完成チェック
             if (result.completedLines.length === 0) {
-                // ライン完成なし → ターン終了可能
-                addLogMessage('Placement confirmed. You can end your turn.', 'success');
+                // ライン完成なし → 即座にターン終了
+                addLogMessage('Card placed. Turn ended.', 'success');
+                updateUI();
+                gameManager.endTurn();
             }
-            // ライン完成時はイベント経由でモーダルが表示される
+            // ライン完成時はイベント経由でモーダルが表示され、解決後に自動的にターン終了
 
             // UI更新（ボタン状態を反映）
             updateUI();
@@ -525,18 +524,6 @@
     }
 
     /**
-     * End Turnボタンのハンドラ
-     */
-    function handleEndTurn() {
-        if (gameState.awaitingLineSelection || gameState.awaitingCardSelection) {
-            addLogMessage('Please complete line/card selection first', 'error');
-            return;
-        }
-
-        gameManager.endTurn();
-    }
-
-    /**
      * 手札カードクリックのハンドラ
      * @param {object} card - クリックされたカード
      */
@@ -545,6 +532,14 @@
 
         if (state.phase === 'ended') {
             addLogMessage('Game has ended', 'error');
+            return;
+        }
+
+        // 念のため、自分のターンかどうかを再確認（二重チェック）
+        const currentPlayer = gameManager.getCurrentPlayer();
+        const clickedPlayerHand = gameManager.players.find(p => p.hand.cards.includes(card));
+        if (clickedPlayerHand !== currentPlayer) {
+            addLogMessage('It is not your turn', 'error');
             return;
         }
 
@@ -605,9 +600,9 @@
 
         clearSelectedCard();
         updateBoard();
-        updateButtons(state);
+        updateButtons();
 
-        addLogMessage(`Card placed tentatively on Slot ${slotNumber}. Click "Confirm Placement" to finalize or "Cancel" to undo.`, 'info');
+        addLogMessage(`Card placed tentatively on Slot ${slotNumber}. Click "Place Card" to finalize or "Cancel" to undo.`, 'info');
     }
 
     /**
@@ -789,6 +784,11 @@
             gameManager.resolveLine(gameState.selectedLine, options);
             gameState.selectedLine = null;
             gameState.completedLines = [];
+
+            // ライン解決後、自動的にターン終了
+            addLogMessage('Line resolved. Turn ended.', 'success');
+            updateUI();
+            gameManager.endTurn();
         } catch (error) {
             addLogMessage(`Error resolving line: ${error.message}`, 'error');
         }
