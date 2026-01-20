@@ -334,6 +334,25 @@ header #btn-new-game {
     50% { transform: scale(1.1); border-color: var(--color-success); }
 }
 
+/* ライン選択時のハイライト */
+.slot.line-highlighted {
+    border-color: var(--color-success);
+    box-shadow: 0 0 20px var(--color-success);
+    animation: lineHighlight 1s ease-in-out infinite;
+}
+
+@keyframes lineHighlight {
+    0%, 100% {
+        transform: scale(1);
+        border-color: var(--color-success);
+    }
+    50% {
+        transform: scale(1.05);
+        border-color: #f1c40f;
+        box-shadow: 0 0 25px #f1c40f;
+    }
+}
+
 /* ========================================
    Sidebar
    ======================================== */
@@ -475,20 +494,22 @@ header #btn-new-game {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: rgba(0, 0, 0, 0.5);
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     z-index: 1000;
+    padding-left: 2rem;
 }
 
 .modal-content {
     background-color: var(--color-bg-light);
     padding: 2rem;
     border-radius: 12px;
-    max-width: 600px;
-    width: 90%;
+    max-width: 350px;
+    width: 100%;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    border: 2px solid var(--color-accent);
 }
 
 .modal-content h3 {

@@ -690,6 +690,33 @@
     }
 
     /**
+     * ボード上のラインをハイライト
+     * @param {Array} slots - スロット番号の配列
+     */
+    function highlightLineOnBoard(slots) {
+        // 既存のハイライトをクリア
+        clearBoardHighlight();
+
+        // 該当スロットにハイライトクラスを追加
+        slots.forEach(slotNumber => {
+            const slotElement = elements.board.querySelector(`[data-slot-number="${slotNumber}"]`);
+            if (slotElement) {
+                slotElement.classList.add('line-highlighted');
+            }
+        });
+    }
+
+    /**
+     * ボードのハイライトをクリア
+     */
+    function clearBoardHighlight() {
+        const highlightedSlots = elements.board.querySelectorAll('.slot.line-highlighted');
+        highlightedSlots.forEach(slot => {
+            slot.classList.remove('line-highlighted');
+        });
+    }
+
+    /**
      * ライン選択UIを表示
      * @param {Array} lines - 完成したライン配列
      */
@@ -712,6 +739,9 @@
                 document.querySelectorAll('.line-option').forEach(el => el.classList.remove('selected'));
                 option.classList.add('selected');
                 option.querySelector('input').checked = true;
+
+                // ボード上のラインをハイライト
+                highlightLineOnBoard(line.slots);
             });
 
             elements.lineOptions.appendChild(option);
@@ -733,6 +763,9 @@
         const lineIndex = parseInt(selectedRadio.value);
         const selectedLine = gameState.completedLines[lineIndex];
         gameState.selectedLine = selectedLine;
+
+        // ハイライトをクリア
+        clearBoardHighlight();
 
         // モーダルを閉じる
         elements.lineSelectionModal.style.display = 'none';
