@@ -22,6 +22,7 @@
                 return;
             }
             this.cards.push(card);
+            this.sortBySymbol(); // カード追加後に自動ソート
         }
 
         // 複数のカードを追加
@@ -34,6 +35,7 @@
                     this.cards.push(card);
                 }
             });
+            this.sortBySymbol(); // カード追加後に自動ソート
         }
 
         // カードが手札に存在するかチェック
