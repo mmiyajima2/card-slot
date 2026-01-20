@@ -173,18 +173,6 @@
             return cards;
         }
 
-        // センタースロットに配置可能かどうかをチェック
-        canPlaceOnCenterSlot(card) {
-            if (!card) {
-                return false;
-            }
-            // Rainbow 7とSilver 3はセンタースロットに配置できない
-            return (
-                card.symbol !== SYMBOLS.RAINBOW_7 &&
-                card.symbol !== SYMBOLS.SILVER_3
-            );
-        }
-
         // 強制リフレッシュを実行（スロット3と7のカードを削除して新しいカードを配置）
         // @param {number} slotNumber - リフレッシュするスロット番号（3または7）
         // @param {object} newCard - 配置する新しいカード
