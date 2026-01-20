@@ -411,10 +411,28 @@
      */
     function addLogMessage(message, type = 'info') {
         const p = document.createElement('p');
-        p.textContent = message;
         p.className = type;
-        elements.gameLog.appendChild(p);
-        elements.gameLog.scrollTop = elements.gameLog.scrollHeight;
+
+        // 時刻を追加（控えめなスタイル）
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('ja-JP', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+        const timeSpan = document.createElement('span');
+        timeSpan.className = 'log-time';
+        timeSpan.textContent = `[${timeStr}] `;
+
+        // メッセージテキストを追加
+        const messageSpan = document.createElement('span');
+        messageSpan.textContent = message;
+
+        p.appendChild(timeSpan);
+        p.appendChild(messageSpan);
+
+        // 新しいメッセージを先頭に追加（最新が上）
+        elements.gameLog.insertBefore(p, elements.gameLog.firstChild);
     }
 
     /**
