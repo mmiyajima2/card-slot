@@ -44,7 +44,7 @@ Each test case should be executed by a single tester controlling both players al
 - Each player has exactly 13 cards in hand
 - Remaining deck has 45 cards
 
-**Status:** [ ]
+**Status:** [x]
 
 ---
 
@@ -65,7 +65,7 @@ Each test case should be executed by a single tester controlling both players al
 - Slot numbering matches the specification
 - All slots are visually distinguishable
 
-**Status:** [ ]
+**Status:** [x]
 
 ---
 
