@@ -71,10 +71,8 @@
             // モーダル: カード選択
             cardSelectionModal: document.getElementById('card-selection-modal'),
             cardSelectionTitle: document.getElementById('card-selection-title'),
-            cardSelectionInstruction: document.getElementById('card-selection-instruction'),
-            boardCardSelection: document.getElementById('board-card-selection'),
+            cardSelectionOptions: document.getElementById('card-selection-options'),
             btnConfirmCards: document.getElementById('btn-confirm-cards'),
-            btnSkipCards: document.getElementById('btn-skip-cards'),
 
             // モーダル: 捨てカード確認
             discardConfirmModal: document.getElementById('discard-confirm-modal'),
@@ -131,9 +129,6 @@
 
         // カード選択確定ボタン
         elements.btnConfirmCards.addEventListener('click', handleConfirmCards);
-
-        // カード選択スキップボタン
-        elements.btnSkipCards.addEventListener('click', handleSkipCards);
 
         // 捨てカード確定ボタン
         elements.btnConfirmDiscard.addEventListener('click', handleConfirmDiscard);
@@ -844,57 +839,75 @@
 
     /**
      * カード選択UIを表示（Silver 3 / Cherry用）
-     * @param {number} maxSelect - 最大選択可能数
+     * @param {number} requiredCount - 必要な選択数（銀3=2, チェリー=1）
      * @param {string} title - タイトル
      */
-    function showCardSelectionUI(maxSelect, title) {
+    function showCardSelectionUI(requiredCount, title) {
         gameState.awaitingCardSelection = true;
-        gameState.maxSelectableCards = maxSelect;
+        gameState.maxSelectableCards = requiredCount;
         gameState.selectedSlots = [];
 
         elements.cardSelectionTitle.textContent = title;
-        elements.cardSelectionInstruction.textContent = `Select up to ${maxSelect} card(s). Slot 9 (center) cannot be selected.`;
+        elements.cardSelectionOptions.innerHTML = '';
 
-        // ボード上のカードを表示（Slot 9以外）
-        elements.boardCardSelection.innerHTML = '';
+        // 有効なスロットを取得（ラインのスロットを除外）
+        const validSlotNumbers = getValidSelectableSlots(gameState.selectedLine.slots);
+        const validSlots = validSlotNumbers.map(slotNumber => ({
+            slotNumber,
+            card: gameManager.board.getCard(slotNumber)
+        }));
 
-        for (let slotNumber = 1; slotNumber <= 9; slotNumber++) {
-            if (slotNumber === CENTER_SLOT) continue; // センタースロットは選択不可
+        // チェリー（1枚選択）の場合はラジオボタン、銀3（2枚選択）の場合はチェックボックス
+        const inputType = requiredCount === 1 ? 'radio' : 'checkbox';
+        const inputName = requiredCount === 1 ? 'card-slot' : '';
 
-            const card = gameManager.board.getCard(slotNumber);
-            if (card) {
-                const cardElement = createCardElement(card);
-                cardElement.classList.add('selectable');
-                cardElement.dataset.slotNumber = slotNumber;
-                cardElement.addEventListener('click', () => handleBoardCardClick(slotNumber, cardElement));
-                elements.boardCardSelection.appendChild(cardElement);
-            }
-        }
+        validSlots.forEach(({ slotNumber, card }) => {
+            const option = document.createElement('div');
+            option.className = 'card-option';
+            option.dataset.slotNumber = slotNumber;
+
+            const label = document.createElement('label');
+            const input = document.createElement('input');
+            input.type = inputType;
+            if (inputName) input.name = inputName;
+            input.value = slotNumber;
+            input.addEventListener('change', () => handleCardSlotSelection(requiredCount));
+
+            label.appendChild(input);
+            label.appendChild(document.createTextNode(` Slot ${slotNumber} - ${card.display}`));
+
+            option.appendChild(label);
+            elements.cardSelectionOptions.appendChild(option);
+        });
+
+        // Confirmボタンは初期状態で無効
+        elements.btnConfirmCards.disabled = true;
 
         elements.cardSelectionModal.style.display = 'flex';
     }
 
     /**
-     * ボードカード選択ハンドラ
-     * @param {number} slotNumber - スロット番号
-     * @param {HTMLElement} cardElement - カード要素
+     * カードスロット選択ハンドラ（チェックボックス/ラジオボタン用）
+     * @param {number} requiredCount - 必要な選択数
      */
-    function handleBoardCardClick(slotNumber, cardElement) {
-        const index = gameState.selectedSlots.indexOf(slotNumber);
+    function handleCardSlotSelection(requiredCount) {
+        // 現在選択されているスロットを取得
+        const selectedInputs = elements.cardSelectionOptions.querySelectorAll('input:checked');
+        const selectedSlots = Array.from(selectedInputs).map(input => parseInt(input.value));
 
-        if (index > -1) {
-            // 選択解除
-            gameState.selectedSlots.splice(index, 1);
-            cardElement.classList.remove('selected');
-        } else {
-            // 選択
-            if (gameState.selectedSlots.length >= gameState.maxSelectableCards) {
-                addLogMessage(`You can only select up to ${gameState.maxSelectableCards} card(s)`, 'error');
-                return;
+        gameState.selectedSlots = selectedSlots;
+
+        // ボード上のハイライトを更新
+        clearBoardHighlight();
+        selectedSlots.forEach(slot => {
+            const slotElement = elements.board.querySelector(`[data-slot-number="${slot}"]`);
+            if (slotElement) {
+                slotElement.classList.add('line-highlighted');
             }
-            gameState.selectedSlots.push(slotNumber);
-            cardElement.classList.add('selected');
-        }
+        });
+
+        // Confirmボタンの有効/無効を切り替え
+        elements.btnConfirmCards.disabled = selectedSlots.length !== requiredCount;
     }
 
     /**
@@ -904,18 +917,8 @@
         // 選択されたスロットでライン解決
         resolveSelectedLine({ selectedSlots: gameState.selectedSlots });
 
-        // モーダルを閉じる
-        elements.cardSelectionModal.style.display = 'none';
-        gameState.awaitingCardSelection = false;
-        gameState.selectedSlots = [];
-    }
-
-    /**
-     * カード選択スキップハンドラ
-     */
-    function handleSkipCards() {
-        // スロット選択なしでライン解決
-        resolveSelectedLine({ selectedSlots: [] });
+        // ハイライトをクリア
+        clearBoardHighlight();
 
         // モーダルを閉じる
         elements.cardSelectionModal.style.display = 'none';

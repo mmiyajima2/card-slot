@@ -557,18 +557,33 @@ header #btn-new-game {
     margin-right: 0.5rem;
 }
 
-/* ボードカード選択 */
-#board-card-selection {
+/* カード選択オプション */
+#card-selection-options {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 0.5rem;
     margin-bottom: 1rem;
-    justify-content: center;
 }
 
-#board-card-selection .card {
-    width: 70px;
-    height: 90px;
+.card-option {
+    padding: 1rem;
+    background-color: var(--color-primary);
+    border: 2px solid var(--color-border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    justify-content: space-between;
+}
+
+.card-option:hover {
+    border-color: var(--color-accent);
+    background-color: var(--color-secondary);
+}
+
+.card-option input[type="radio"],
+.card-option input[type="checkbox"] {
+    margin-right: 0.5rem;
 }
 
 /* モーダルアクション（ボタン配置） */
