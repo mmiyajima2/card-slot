@@ -189,11 +189,32 @@
                 const selectedLine = data.lines[0];
                 gameState.selectedLine = selectedLine;
 
-                // Silver 3 / Cherryの場合、カード選択UIを表示
+                // Silver 3 / Cherryの場合、有効なカード数をチェック
                 if (selectedLine.symbol === SYMBOLS.SILVER_3) {
-                    showCardSelectionUI(2, 'Silver 3: Select up to 2 cards from board');
+                    const validSlots = getValidSelectableSlots(selectedLine.slots);
+                    console.log('[DEBUG] Silver 3 - Valid slots:', validSlots, 'Count:', validSlots.length, 'Line slots:', selectedLine.slots);
+                    if (validSlots.length <= 2) {
+                        // 有効なカードが2枚以下なら自動で取得
+                        addLogMessage(`Silver 3: Auto-selecting ${validSlots.length} card(s) from board`, 'info');
+                        resolveSelectedLine({ selectedSlots: validSlots });
+                    } else {
+                        // 3枚以上ある場合は選択UIを表示
+                        showCardSelectionUI(2, 'Silver 3: Select up to 2 cards from board');
+                    }
                 } else if (selectedLine.symbol === SYMBOLS.CHERRY) {
-                    showCardSelectionUI(1, 'Cherry: Select up to 1 card from board');
+                    const validSlots = getValidSelectableSlots(selectedLine.slots);
+                    console.log('[DEBUG] Cherry - Valid slots:', validSlots, 'Count:', validSlots.length, 'Line slots:', selectedLine.slots);
+                    if (validSlots.length === 1) {
+                        // 有効なカードが1枚なら自動で取得
+                        addLogMessage(`Cherry: Auto-selecting 1 card from board`, 'info');
+                        resolveSelectedLine({ selectedSlots: validSlots });
+                    } else if (validSlots.length === 0) {
+                        // 有効なカードがない場合はそのまま解決
+                        resolveSelectedLine({ selectedSlots: [] });
+                    } else {
+                        // 2枚以上ある場合は選択UIを表示
+                        showCardSelectionUI(1, 'Cherry: Select up to 1 card from board');
+                    }
                 } else {
                     // それ以外はそのまま解決
                     resolveSelectedLine({});
@@ -771,15 +792,54 @@
         elements.lineSelectionModal.style.display = 'none';
         gameState.awaitingLineSelection = false;
 
-        // Silver 3 / Cherryの場合、カード選択UIを表示
+        // Silver 3 / Cherryの場合、有効なカード数をチェック
         if (selectedLine.symbol === SYMBOLS.SILVER_3) {
-            showCardSelectionUI(2, 'Silver 3: Select up to 2 cards from board');
+            const validSlots = getValidSelectableSlots(selectedLine.slots);
+            console.log('[DEBUG] Silver 3 (from line selection) - Valid slots:', validSlots, 'Count:', validSlots.length, 'Line slots:', selectedLine.slots);
+            if (validSlots.length <= 2) {
+                // 有効なカードが2枚以下なら自動で取得
+                addLogMessage(`Silver 3: Auto-selecting ${validSlots.length} card(s) from board`, 'info');
+                resolveSelectedLine({ selectedSlots: validSlots });
+            } else {
+                // 3枚以上ある場合は選択UIを表示
+                showCardSelectionUI(2, 'Silver 3: Select up to 2 cards from board');
+            }
         } else if (selectedLine.symbol === SYMBOLS.CHERRY) {
-            showCardSelectionUI(1, 'Cherry: Select up to 1 card from board');
+            const validSlots = getValidSelectableSlots(selectedLine.slots);
+            console.log('[DEBUG] Cherry (from line selection) - Valid slots:', validSlots, 'Count:', validSlots.length, 'Line slots:', selectedLine.slots);
+            if (validSlots.length === 1) {
+                // 有効なカードが1枚なら自動で取得
+                addLogMessage(`Cherry: Auto-selecting 1 card from board`, 'info');
+                resolveSelectedLine({ selectedSlots: validSlots });
+            } else if (validSlots.length === 0) {
+                // 有効なカードがない場合はそのまま解決
+                resolveSelectedLine({ selectedSlots: [] });
+            } else {
+                // 2枚以上ある場合は選択UIを表示
+                showCardSelectionUI(1, 'Cherry: Select up to 1 card from board');
+            }
         } else {
             // それ以外はそのまま解決
             resolveSelectedLine({});
         }
+    }
+
+    /**
+     * ボードから有効な選択可能スロットを取得（センタースロット以外）
+     * @param {number[]} excludeSlots - 除外するスロット番号の配列（解決するラインのスロットなど）
+     * @returns {number[]} 有効なスロット番号の配列
+     */
+    function getValidSelectableSlots(excludeSlots = []) {
+        const validSlots = [];
+        for (let slotNumber = 1; slotNumber <= 9; slotNumber++) {
+            if (slotNumber === CENTER_SLOT) continue;
+            if (excludeSlots.includes(slotNumber)) continue;
+            const card = gameManager.board.getCard(slotNumber);
+            if (card) {
+                validSlots.push(slotNumber);
+            }
+        }
+        return validSlots;
     }
 
     /**
