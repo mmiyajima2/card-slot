@@ -36,6 +36,7 @@
                 slots,
                 success: false,
                 instantWin: false,
+                deckEmpty: false,
                 cardsAddedToHand: [],
                 cardsDrawnFromDeck: [],
                 replayActionExecuted: false,
@@ -85,17 +86,17 @@
         }
 
         /**
-         * Silver 3効果: ボードから最大2枚取得
+         * Silver 3効果: デッキのすべてのカードを捨て札に移動
          */
         _resolveSilver3Effect(playerHand, selectedSlots, result) {
-            const validSlots = this._getValidSlotsForPickup(selectedSlots, 2);
-            validSlots.forEach((slot) => {
-                const card = this.board.removeCard(slot);
+            // デッキのすべてのカードを捨て札に移動
+            while (!this.deck.isEmpty()) {
+                const card = this.deck.draw();
                 if (card) {
-                    playerHand.addCard(card);
-                    result.cardsAddedToHand.push({ slot, card });
+                    this.discardPile.add(card);
                 }
-            });
+            }
+            result.deckEmpty = true;
         }
 
         /**

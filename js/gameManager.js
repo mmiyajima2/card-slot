@@ -93,8 +93,8 @@
             this.winner = null;
             this.winReason = null;
 
-            // 各プレイヤーに13枚配る
-            for (let i = 0; i < 13; i++) {
+            // 各プレイヤーに10枚配る
+            for (let i = 0; i < 10; i++) {
                 player1.hand.addCard(this.deck.draw());
                 player2.hand.addCard(this.deck.draw());
             }
@@ -132,7 +132,7 @@
                 const gold7Count = player.hand.countBySymbol(SYMBOLS.RAINBOW_7);
                 const silver3Count = player.hand.countBySymbol(SYMBOLS.SILVER_3);
 
-                if (gold7Count === 5 && silver3Count === 8) {
+                if (gold7Count === 5 && silver3Count === 5) {
                     return player;
                 }
             }
@@ -453,6 +453,17 @@
                     instantWin: true
                 });
                 this.endGame(currentPlayer, "rainbow_7_line");
+                return result;
+            }
+
+            // 銀3によるデッキ枯渇チェック
+            if (result.deckEmpty) {
+                this.emit("lineResolved", {
+                    player: currentPlayer.name,
+                    symbol: result.symbol,
+                    deckEmpty: true
+                });
+                this._endGameByDeckEmpty();
                 return result;
             }
 

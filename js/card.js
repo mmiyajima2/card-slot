@@ -33,7 +33,7 @@
         },
         [SYMBOLS.SILVER_3]: {
             symbol: SYMBOLS.SILVER_3,
-            count: 8,
+            count: 5,
             score: -1,
             display: "Silver 3",
             image: "assets/silver_3.svg",

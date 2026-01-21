@@ -186,18 +186,10 @@
                 const selectedLine = data.lines[0];
                 gameState.selectedLine = selectedLine;
 
-                // Silver 3 / Cherryの場合、有効なカード数をチェック
+                // Silver 3は即座にデッキを空にするため、カード選択不要
                 if (selectedLine.symbol === SYMBOLS.SILVER_3) {
-                    const validSlots = getValidSelectableSlots(selectedLine.slots);
-                    console.log('[DEBUG] Silver 3 - Valid slots:', validSlots, 'Count:', validSlots.length, 'Line slots:', selectedLine.slots);
-                    if (validSlots.length <= 2) {
-                        // 有効なカードが2枚以下なら自動で取得
-                        addLogMessage(`Silver 3: Auto-selecting ${validSlots.length} card(s) from board`, 'info');
-                        resolveSelectedLine({ selectedSlots: validSlots });
-                    } else {
-                        // 3枚以上ある場合は選択UIを表示
-                        showCardSelectionUI(2, 'Silver 3: Select up to 2 cards from board');
-                    }
+                    addLogMessage(`Silver 3: Discarding entire deck...`, 'info');
+                    resolveSelectedLine({ selectedSlots: [] });
                 } else if (selectedLine.symbol === SYMBOLS.CHERRY) {
                     const validSlots = getValidSelectableSlots(selectedLine.slots);
                     console.log('[DEBUG] Cherry - Valid slots:', validSlots, 'Count:', validSlots.length, 'Line slots:', selectedLine.slots);
@@ -805,18 +797,10 @@
         elements.lineSelectionModal.style.display = 'none';
         gameState.awaitingLineSelection = false;
 
-        // Silver 3 / Cherryの場合、有効なカード数をチェック
+        // Silver 3は即座にデッキを空にするため、カード選択不要
         if (selectedLine.symbol === SYMBOLS.SILVER_3) {
-            const validSlots = getValidSelectableSlots(selectedLine.slots);
-            console.log('[DEBUG] Silver 3 (from line selection) - Valid slots:', validSlots, 'Count:', validSlots.length, 'Line slots:', selectedLine.slots);
-            if (validSlots.length <= 2) {
-                // 有効なカードが2枚以下なら自動で取得
-                addLogMessage(`Silver 3: Auto-selecting ${validSlots.length} card(s) from board`, 'info');
-                resolveSelectedLine({ selectedSlots: validSlots });
-            } else {
-                // 3枚以上ある場合は選択UIを表示
-                showCardSelectionUI(2, 'Silver 3: Select up to 2 cards from board');
-            }
+            addLogMessage(`Silver 3: Discarding entire deck...`, 'info');
+            resolveSelectedLine({ selectedSlots: [] });
         } else if (selectedLine.symbol === SYMBOLS.CHERRY) {
             const validSlots = getValidSelectableSlots(selectedLine.slots);
             console.log('[DEBUG] Cherry (from line selection) - Valid slots:', validSlots, 'Count:', validSlots.length, 'Line slots:', selectedLine.slots);
