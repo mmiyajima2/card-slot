@@ -33,6 +33,13 @@
             this.winner = null;
             this.winReason = null;
 
+            // ゲーム設定
+            this.gameConfig = {
+                mode: 'solo',      // 'solo' or 'cpu'
+                firstPlayer: 1,    // 1 or 2
+                cpuLevel: 'easy'   // 'easy', 'medium', 'hard'
+            };
+
             // イベントハンドラ管理
             this.eventHandlers = new Map();
         }
@@ -73,8 +80,16 @@
          * ゲームを開始
          * @param {string} player1Name - プレイヤー1の名前
          * @param {string} player2Name - プレイヤー2の名前
+         * @param {object} config - ゲーム設定 { mode: 'solo'/'cpu', firstPlayer: 1/2, cpuLevel: 'easy'/'medium'/'hard' }
          */
-        startGame(player1Name = "Player 1", player2Name = "Player 2") {
+        startGame(player1Name = "Player 1", player2Name = "Player 2", config = {}) {
+            // ゲーム設定を更新
+            this.gameConfig = {
+                mode: config.mode || 'solo',
+                firstPlayer: config.firstPlayer || 1,
+                cpuLevel: config.cpuLevel || 'easy'
+            };
+
             // 初期化
             this.deck = Deck.createShuffledFullDeck();
             this.discardPile = new DiscardPile();
@@ -88,7 +103,8 @@
             player2.hand = new Hand(player2Name);
 
             this.players = [player1, player2];
-            this.currentPlayerIndex = 0;
+            // 先攻プレイヤーを設定（firstPlayerは1または2）
+            this.currentPlayerIndex = this.gameConfig.firstPlayer - 1;
             this.gamePhase = "setup";
             this.winner = null;
             this.winReason = null;

@@ -607,6 +607,59 @@ header #btn-new-game {
     margin-top: 1.5rem;
 }
 
+/* ゲームモード選択モーダル */
+.game-mode-section {
+    margin-bottom: 1.5rem;
+}
+
+.game-mode-section h4 {
+    color: var(--color-text);
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+}
+
+#mode-options,
+#first-player-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.mode-option {
+    padding: 0.875rem 1rem;
+    background-color: var(--color-primary);
+    border: 2px solid var(--color-border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.mode-option:hover {
+    border-color: var(--color-accent);
+    background-color: var(--color-secondary);
+}
+
+.mode-option label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    width: 100%;
+}
+
+.mode-option input[type="radio"] {
+    margin-right: 0.75rem;
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+}
+
+.mode-option:has(input[type="radio"]:checked) {
+    border-color: var(--color-accent);
+    background-color: var(--color-secondary);
+    box-shadow: 0 0 10px rgba(233, 69, 96, 0.5);
+}
+
 /* ========================================
    Responsive
    ======================================== */

@@ -78,7 +78,11 @@
             discardConfirmModal: document.getElementById('discard-confirm-modal'),
             discardConfirmMessage: document.getElementById('discard-confirm-message'),
             btnConfirmDiscard: document.getElementById('btn-confirm-discard'),
-            btnCancelDiscard: document.getElementById('btn-cancel-discard')
+            btnCancelDiscard: document.getElementById('btn-cancel-discard'),
+
+            // モーダル: ゲームモード選択
+            gameModeModal: document.getElementById('game-mode-modal'),
+            btnStartGame: document.getElementById('btn-start-game')
         };
     }
 
@@ -135,6 +139,9 @@
 
         // 捨てカードキャンセルボタン
         elements.btnCancelDiscard.addEventListener('click', handleCancelDiscard);
+
+        // ゲーム開始ボタン（モーダル内）
+        elements.btnStartGame.addEventListener('click', handleStartGameFromModal);
     }
 
     /**
@@ -526,10 +533,25 @@
      * New Gameボタンのハンドラ
      */
     function handleNewGame() {
+        // ゲームモード選択モーダルを表示
+        elements.gameModeModal.style.display = 'flex';
+    }
+
+    /**
+     * モーダルからのゲーム開始ハンドラ
+     */
+    function handleStartGameFromModal() {
+        // 選択されたゲームモードを取得
+        const selectedMode = document.querySelector('input[name="game-mode"]:checked').value;
+        const selectedFirstPlayer = document.querySelector('input[name="first-player"]:checked').value;
+
         // Google Analytics イベント送信
         if (globalThis.CardSlot && globalThis.CardSlot.Analytics) {
             globalThis.CardSlot.Analytics.trackNewGame();
         }
+
+        // モーダルを閉じる
+        elements.gameModeModal.style.display = 'none';
 
         // 実況メッセージをクリア
         if (elements.commentaryMessages) {
@@ -547,8 +569,15 @@
         gameState.selectedSlots = [];
         gameState.selectedLine = null;
 
+        // ゲーム設定オブジェクトを作成
+        const gameConfig = {
+            mode: selectedMode,           // 'solo' or 'cpu'
+            firstPlayer: parseInt(selectedFirstPlayer), // 1 or 2
+            cpuLevel: 'easy'              // 現在は常に'easy'
+        };
+
         // ゲーム開始
-        gameManager.startGame('Player 1', 'Player 2');
+        gameManager.startGame('Player 1', 'Player 2', gameConfig);
     }
 
     /**

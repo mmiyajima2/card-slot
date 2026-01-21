@@ -85,6 +85,51 @@
                 </aside>
             </main>
 
+            <!-- モーダル: ゲームモード選択 -->
+            <div id="game-mode-modal" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <h3>Game Mode Selection</h3>
+
+                    <div class="game-mode-section">
+                        <h4>Game Mode</h4>
+                        <div id="mode-options">
+                            <div class="mode-option">
+                                <label>
+                                    <input type="radio" name="game-mode" value="solo" checked>
+                                    Solo Play
+                                </label>
+                            </div>
+                            <div class="mode-option">
+                                <label>
+                                    <input type="radio" name="game-mode" value="cpu">
+                                    vs CPU (Easy)
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="game-mode-section">
+                        <h4>First Player</h4>
+                        <div id="first-player-options">
+                            <div class="mode-option">
+                                <label>
+                                    <input type="radio" name="first-player" value="1" checked>
+                                    Player 1
+                                </label>
+                            </div>
+                            <div class="mode-option">
+                                <label>
+                                    <input type="radio" name="first-player" value="2">
+                                    Player 2
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button id="btn-start-game" class="btn btn-primary">Start Game</button>
+                </div>
+            </div>
+
             <!-- モーダル: ライン選択 -->
             <div id="line-selection-modal" class="modal" style="display: none;">
                 <div class="modal-content">
