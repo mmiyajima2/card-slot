@@ -950,6 +950,13 @@
                 return;
             }
 
+            // ゲームが終了している場合はターン終了処理をスキップ
+            const currentState = gameManager.getGameState();
+            if (currentState.phase === 'ended') {
+                updateUI();
+                return;
+            }
+
             // ライン解決後、自動的にターン終了
             addLogMessage('Line resolved. Turn ended.', 'success');
             updateUI();

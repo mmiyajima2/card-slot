@@ -512,7 +512,7 @@
             const score2 = player2.getScore();
 
             // スコア判定イベントを発行（実況エリア用）
-            this.emitEvent('deckEmptyScoreJudgment', {
+            this.emit('deckEmptyScoreJudgment', {
                 player1: {
                     name: player1.name,
                     score: score1
