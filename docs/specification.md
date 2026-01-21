@@ -28,9 +28,9 @@ In addition, **Slots 3 and 7** are strategically important due to forced refresh
 | Silver 3   | 8 |
 | Cherry     | 8 |
 | Watermelon | 8 |
-| Bell       | 21 |
-| REPLAY     | 21 |
-| **Total**  | **71** |
+| Bell       | 13 |
+| REPLAY     | 13 |
+| **Total**  | **55** |
 
 ---
 
