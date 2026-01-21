@@ -144,14 +144,14 @@
         // ゲーム開始イベント
         gameManager.on('gameStarted', (data) => {
             addLogMessage(`Game started! ${data.currentPlayer}'s turn`, 'success');
-            showCommentary(`${data.currentPlayer}のターンです`, 'turn');
+            showCommentary(`${data.currentPlayer}'s Turn`, 'turn');
             updateUI();
         });
 
         // ターン開始イベント
         gameManager.on('turnStarted', (data) => {
             addLogMessage(`${data.player}'s turn started`, 'info');
-            showCommentary(`${data.player}のターンです`, 'turn');
+            showCommentary(`${data.player}'s Turn`, 'turn');
             updateUI();
         });
 
@@ -250,7 +250,7 @@
         // 強制リフレッシュイベント
         gameManager.on('forcedRefreshOccurred', (data) => {
             addLogMessage(`Forced Refresh! Slots 3 and 7 refreshed`, 'info');
-            showCommentary('リフレッシュが発生しました', 'effect');
+            showCommentary('Refresh Occurred', 'effect');
             data.refreshResults.forEach(r => {
                 if (r.removedCard) {
                     addLogMessage(`Slot ${r.slot}: ${r.removedCard.symbol} → ${r.placedCard.symbol}`, 'info');
