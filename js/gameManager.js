@@ -323,13 +323,21 @@
                 if (!hasRainbow7Line) {
                     // 手札0枚で敗北
                     currentPlayer.eliminate();
+
+                    // 相手プレイヤーの勝利
+                    const opponent = this.players.find(p => p !== currentPlayer);
+
+                    // 手札枯渇による勝敗イベントを発行（実況エリア用）
+                    this.emit("handDepletionVictory", {
+                        eliminatedPlayer: currentPlayer.name,
+                        winner: opponent.name
+                    });
+
                     this.emit("playerEliminated", {
                         player: currentPlayer.name,
                         reason: "hand_empty"
                     });
 
-                    // 相手プレイヤーの勝利
-                    const opponent = this.players.find(p => p !== currentPlayer);
                     this.endGame(opponent, "opponent_eliminated");
                     return {
                         success: true,

@@ -266,6 +266,13 @@
             addLogMessage(message.replace(/\n/g, ' '), 'info');
         });
 
+        // 手札枯渇による勝敗イベント
+        gameManager.on('handDepletionVictory', (data) => {
+            const message = `${data.eliminatedPlayer} ran out of cards!\n${data.winner} wins!`;
+            showCommentary(message, 'elimination-result');
+            addLogMessage(message.replace(/\n/g, ' '), 'info');
+        });
+
         // プレイヤー敗北イベント
         gameManager.on('playerEliminated', (data) => {
             addLogMessage(`${data.player} eliminated (${data.reason})`, 'error');
