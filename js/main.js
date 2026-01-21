@@ -259,6 +259,13 @@
             updateUI();
         });
 
+        // Deck枯渇時のスコア判定イベント
+        gameManager.on('deckEmptyScoreJudgment', (data) => {
+            const message = `Deck Empty! Score Judgment:\n${data.player1.name}: ${data.player1.score} pts\n${data.player2.name}: ${data.player2.score} pts\nWinner: ${data.winner}`;
+            showCommentary(message, 'score-result');
+            addLogMessage(message.replace(/\n/g, ' '), 'info');
+        });
+
         // プレイヤー敗北イベント
         gameManager.on('playerEliminated', (data) => {
             addLogMessage(`${data.player} eliminated (${data.reason})`, 'error');

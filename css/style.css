@@ -407,6 +407,14 @@ header #btn-new-game {
     background-color: rgba(46, 204, 113, 0.15);
 }
 
+.commentary-message.score-result {
+    border-left-color: #FFD700;
+    background-color: rgba(255, 215, 0, 0.15);
+    font-weight: bold;
+    padding: 0.75rem 0.875rem;
+    white-space: pre-line;
+}
+
 @keyframes fadeIn {
     from {
         opacity: 0;

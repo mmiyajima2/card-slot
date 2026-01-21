@@ -480,6 +480,21 @@
             const score1 = player1.getScore();
             const score2 = player2.getScore();
 
+            // スコア判定イベントを発行（実況エリア用）
+            this.emitEvent('deckEmptyScoreJudgment', {
+                player1: {
+                    name: player1.name,
+                    score: score1
+                },
+                player2: {
+                    name: player2.name,
+                    score: score2
+                },
+                winner: score1 > score2 ? player1.name :
+                        score2 > score1 ? player2.name :
+                        'Draw'
+            });
+
             if (score1 > score2) {
                 this.endGame(player1, "deck_empty_score");
             } else if (score2 > score1) {
