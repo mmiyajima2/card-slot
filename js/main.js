@@ -55,8 +55,8 @@
             player2Hand: document.getElementById('player2-hand'),
             player2Status: document.getElementById('player2-status'),
 
-            // ゲームログ
-            gameLog: document.getElementById('game-log'),
+            // 実況表示エリア
+            commentaryMessages: document.getElementById('commentary-messages'),
 
             // アクションボタン
             btnNewGame: document.getElementById('btn-new-game'),
@@ -144,12 +144,14 @@
         // ゲーム開始イベント
         gameManager.on('gameStarted', (data) => {
             addLogMessage(`Game started! ${data.currentPlayer}'s turn`, 'success');
+            showCommentary(`${data.currentPlayer}のターンです`, 'turn');
             updateUI();
         });
 
         // ターン開始イベント
         gameManager.on('turnStarted', (data) => {
             addLogMessage(`${data.player}'s turn started`, 'info');
+            showCommentary(`${data.player}のターンです`, 'turn');
             updateUI();
         });
 
@@ -248,6 +250,7 @@
         // 強制リフレッシュイベント
         gameManager.on('forcedRefreshOccurred', (data) => {
             addLogMessage(`Forced Refresh! Slots 3 and 7 refreshed`, 'info');
+            showCommentary('リフレッシュが発生しました', 'effect');
             data.refreshResults.forEach(r => {
                 if (r.removedCard) {
                     addLogMessage(`Slot ${r.slot}: ${r.removedCard.symbol} → ${r.placedCard.symbol}`, 'info');
@@ -456,34 +459,33 @@
     }
 
     /**
-     * ゲームログにメッセージを追加
+     * ゲームログにメッセージを追加（開発者向け・コンソールのみ）
      * @param {string} message - メッセージ
      * @param {string} type - メッセージタイプ ('info', 'success', 'error')
      */
     function addLogMessage(message, type = 'info') {
-        const p = document.createElement('p');
-        p.className = type;
+        // コンソールにのみ出力
+        console.log(`[${type.toUpperCase()}] ${message}`);
+    }
 
-        // 時刻を追加（控えめなスタイル）
-        const now = new Date();
-        const timeStr = now.toLocaleTimeString('ja-JP', {
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit'
-        });
-        const timeSpan = document.createElement('span');
-        timeSpan.className = 'log-time';
-        timeSpan.textContent = `[${timeStr}] `;
+    /**
+     * 実況メッセージを表示（プレイヤー向け）
+     * @param {string} message - メッセージ
+     * @param {string} type - メッセージタイプ ('turn', 'effect')
+     */
+    function showCommentary(message, type = 'turn') {
+        if (!elements.commentaryMessages) return;
 
-        // メッセージテキストを追加
-        const messageSpan = document.createElement('span');
-        messageSpan.textContent = message;
+        // 新しいメッセージ要素を作成
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `commentary-message ${type}`;
+        messageDiv.textContent = message;
 
-        p.appendChild(timeSpan);
-        p.appendChild(messageSpan);
+        // 既存のメッセージをクリア（常に最新の1件のみ表示）
+        elements.commentaryMessages.innerHTML = '';
 
-        // 新しいメッセージを先頭に追加（最新が上）
-        elements.gameLog.insertBefore(p, elements.gameLog.firstChild);
+        // 新しいメッセージを追加
+        elements.commentaryMessages.appendChild(messageDiv);
     }
 
     /**
@@ -495,8 +497,10 @@
             globalThis.CardSlot.Analytics.trackNewGame();
         }
 
-        // ゲームログをクリア
-        elements.gameLog.innerHTML = '';
+        // 実況メッセージをクリア
+        if (elements.commentaryMessages) {
+            elements.commentaryMessages.innerHTML = '';
+        }
 
         // ゲーム状態をリセット
         gameState.selectedCard = null;
