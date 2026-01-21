@@ -1,16 +1,18 @@
 # Card Slot
-**Game Specification (v1.0.1)**
+**Game Specification (v1.1.0)**
 
 ---
 
 ## 1. Game Overview
 
-Card Slot is a two-player competitive board game inspired by slot machine symbols.
-Players place cards onto a 3×3 board, form lines (combinations), resolve their effects,
+Card Slot is a two-player competitive board game inspired by slot machine symbols.  
+Players place cards onto a 3×3 board, form lines (combinations), resolve their effects,  
 and aim to achieve the win conditions.
 
-Strategic placement, hand management, and **control of the Center Slot (9)** are core elements of the game.
+Strategic placement, hand management, and **control of the Center Slot (9)** are core elements of the game.  
 In addition, **Slots 3 and 7** are strategically important due to forced refresh rules.
+
+**Survive First, Win Later**
 
 ---
 
@@ -22,15 +24,15 @@ In addition, **Slots 3 and 7** are strategically important due to forced refresh
 
 ## 3. Cards
 
-| Symbol     | Count |
-|------------|------:|
-| Rainbow 7     | 5 |
-| Silver 3   | 8 |
-| Cherry     | 8 |
-| Watermelon | 8 |
-| Bell       | 13 |
-| REPLAY     | 13 |
-| **Total**  | **55** |
+| Symbol       | Count |
+|--------------|------:|
+| Rainbow 7    | 5 |
+| Silver 3     | 5 |
+| Cherry       | 8 |
+| Watermelon   | 8 |
+| Bell         | 13 |
+| REPLAY       | 13 |
+| **Total**    | **52** |
 
 ---
 
@@ -38,7 +40,7 @@ In addition, **Slots 3 and 7** are strategically important due to forced refresh
 
 ### 4.1 Slot Layout
 
-```
+```txt
 +---+---+---+
 | 1 | 2 | 3 |
 +---+---+---+
@@ -47,6 +49,7 @@ In addition, **Slots 3 and 7** are strategically important due to forced refresh
 | 7 | 6 | 5 |
 +---+---+---+
 ```
+
 
 ### 4.2 Lines (8 Total)
 
@@ -59,7 +62,7 @@ In addition, **Slots 3 and 7** are strategically important due to forced refresh
 ## 5. Setup
 
 1. Shuffle all cards to form the **Deck**
-2. Deal 13 cards to each player as their **Hand**
+2. Deal **10 cards** to each player as their **Hand**
 3. Place the remaining cards face-down as the Deck
 4. Prepare a face-down **Discard Pile**
 5. Decide the first player by any fair method
@@ -83,8 +86,8 @@ In addition, **Slots 3 and 7** are strategically important due to forced refresh
 
 If a player's initial Hand consists of:
 
-- Rainbow 7 ×5 
-- Silver 3 × 8 
+- Rainbow 7 ×5  
+- Silver 3 ×5  
 
 That player may immediately declare **Heavenly Hand** and win.
 
@@ -113,7 +116,7 @@ If the Board is completely filled at the start of a turn:
 ### 7.2 Normal Turn
 
 1. Choose 1 card from Hand
-2. Place it on any empty Slot
+2. Place it on any empty Slot  
    - If no Slots are empty, discard 1 non-center card, then place the card
 3. If one or more Lines are completed, select exactly 1 Line and resolve it
 4. End the turn
@@ -142,13 +145,13 @@ If the Board is completely filled at the start of a turn:
 ### 9.1 Silver 3 (Three of a Kind)
 
 - Discard the resolved cards
-- Select up to 2 cards from the Board and add them to Hand
-- If no valid cards exist, the effect is skipped
-- If two or fewer valid cards are available, taking them is mandatory
+- **Immediately set the Deck to 0**
+- The game ends at once and proceeds to **End of Deck** evaluation
 
-**Restrictions**
+**Notes**
 
-- Slot 9 cannot be selected
+- This effect represents a deliberate decision to end the game
+- Survival status is checked before scoring
 
 ---
 
@@ -168,7 +171,7 @@ If the Board is completely filled at the start of a turn:
 ### 9.3 Watermelon (Three of a Kind)
 
 - Discard the resolved cards
-- Draw the top two cards from the Deck, one at a time.
+- Draw the top two cards from the Deck, one at a time
 
 **Clarification**
 
@@ -182,7 +185,6 @@ If the Board is completely filled at the start of a turn:
 
 - Discard the resolved cards
 - Draw the top card of the Deck
-
 
 ---
 
@@ -233,7 +235,7 @@ If the Board is completely filled at the start of a turn:
 
 | Card       | Score |
 |------------|------:|
-| Rainbow 7     | -1 |
+| Rainbow 7  | -1 |
 | Silver 3   | -1 |
 | Cherry     | 1 |
 | Watermelon | 2 |
@@ -246,5 +248,6 @@ If the Board is completely filled at the start of a turn:
 
 - Slot 9 is the most strategically important Slot
 - Slots 3 and 7 are important due to Forced Refresh
+- Silver 3 represents a strategic choice to end the game
 - Line resolution is mandatory and central to balance
 - **Survive First, Win Later**

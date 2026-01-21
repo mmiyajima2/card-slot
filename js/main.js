@@ -550,15 +550,15 @@
             gameState.tentativePlacement = null;
             gameState.awaitingConfirmation = false;
 
-            // プレイヤー敗北チェック（手札0枚）
-            if (result.playerEliminated) {
-                updateUI();
-                return;
-            }
-
             // ライン完成チェック
             if (result.completedLines.length === 0) {
-                // ライン完成なし → 即座にターン終了
+                // ライン完成なし → 手札0枚チェック後、ターン終了
+                const handCheckResult = gameManager.checkHandEmptyAfterLineResolution();
+                if (handCheckResult.playerEliminated) {
+                    updateUI();
+                    return;
+                }
+
                 addLogMessage('Card placed. Turn ended.', 'success');
                 updateUI();
                 gameManager.endTurn();
@@ -958,6 +958,13 @@
             gameManager.resolveLine(gameState.selectedLine, options);
             gameState.selectedLine = null;
             gameState.completedLines = [];
+
+            // ライン解決後、手札0枚チェック
+            const handCheckResult = gameManager.checkHandEmptyAfterLineResolution();
+            if (handCheckResult.playerEliminated) {
+                updateUI();
+                return;
+            }
 
             // ライン解決後、自動的にターン終了
             addLogMessage('Line resolved. Turn ended.', 'success');

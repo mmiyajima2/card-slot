@@ -316,37 +316,6 @@
                 handSize: currentPlayer.getHandSize()
             });
 
-            // 手札が0枚になったらチェック
-            if (currentPlayer.hasEmptyHand()) {
-                // Rainbow 7ラインが揃っているかチェック（即勝利が優先）
-                const hasRainbow7Line = this.board.hasRainbow7Line();
-                if (!hasRainbow7Line) {
-                    // 手札0枚で敗北
-                    currentPlayer.eliminate();
-
-                    // 相手プレイヤーの勝利
-                    const opponent = this.players.find(p => p !== currentPlayer);
-
-                    // 手札枯渇による勝敗イベントを発行（実況エリア用）
-                    this.emit("handDepletionVictory", {
-                        eliminatedPlayer: currentPlayer.name,
-                        winner: opponent.name
-                    });
-
-                    this.emit("playerEliminated", {
-                        player: currentPlayer.name,
-                        reason: "hand_empty"
-                    });
-
-                    this.endGame(opponent, "opponent_eliminated");
-                    return {
-                        success: true,
-                        completedLines: [],
-                        playerEliminated: true
-                    };
-                }
-            }
-
             // ライン完成チェック
             const completedLines = this.board.getCompletedLines();
 
@@ -364,8 +333,7 @@
 
             return {
                 success: true,
-                completedLines,
-                playerEliminated: false
+                completedLines
             };
         }
 
@@ -416,6 +384,50 @@
         }
 
         // ==================== ライン解決 ====================
+
+        /**
+         * ライン解決後の手札0枚チェック
+         * ライン効果が適用された後に呼び出すこと
+         * @returns {object} { playerEliminated: boolean, winner: Player|null }
+         */
+        checkHandEmptyAfterLineResolution() {
+            const currentPlayer = this.getCurrentPlayer();
+
+            // 手札が0枚になったらチェック
+            if (currentPlayer.hasEmptyHand()) {
+                // Rainbow 7ラインが揃っているかチェック（即勝利が優先）
+                const hasRainbow7Line = this.board.hasRainbow7Line();
+                if (!hasRainbow7Line) {
+                    // 手札0枚で敗北
+                    currentPlayer.eliminate();
+
+                    // 相手プレイヤーの勝利
+                    const opponent = this.players.find(p => p !== currentPlayer);
+
+                    // 手札枯渇による勝敗イベントを発行（実況エリア用）
+                    this.emit("handDepletionVictory", {
+                        eliminatedPlayer: currentPlayer.name,
+                        winner: opponent.name
+                    });
+
+                    this.emit("playerEliminated", {
+                        player: currentPlayer.name,
+                        reason: "hand_empty"
+                    });
+
+                    this.endGame(opponent, "opponent_eliminated");
+                    return {
+                        playerEliminated: true,
+                        winner: opponent
+                    };
+                }
+            }
+
+            return {
+                playerEliminated: false,
+                winner: null
+            };
+        }
 
         /**
          * ラインを解決
