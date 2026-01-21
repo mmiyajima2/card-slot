@@ -219,7 +219,9 @@
         // ライン解決イベント
         gameManager.on('lineResolved', (data) => {
             if (data.instantWin) {
-                // instantWinの場合はgameEndedイベントで表示するため、ここでは何もしない
+                // 虹7が揃った時の実況メッセージ
+                showCommentary(`🌈 Rainbow 7 Line!\n${data.player} Wins!`, 'victory');
+                addLogMessage(`${data.player} completed Rainbow 7 line and wins!`, 'success');
                 return;
             }
             addLogMessage(`${data.player} resolved ${data.symbol} line`, 'success');
@@ -284,9 +286,35 @@
                     'deck_empty_draw': 'Draw'
                 };
                 const reasonText = reasonMessages[data.reason] || data.reason;
+
+                // 実況エリアへの勝利メッセージ表示
+                let commentaryMessage = '';
+                switch (data.reason) {
+                    case 'rainbow_7_line':
+                        commentaryMessage = `🌈 Rainbow 7 Line!\n${data.winner} Wins!`;
+                        break;
+                    case 'heavenly_hand':
+                        commentaryMessage = `✨ Heavenly Hand!\n${data.winner} Wins!`;
+                        break;
+                    case 'opponent_eliminated':
+                        commentaryMessage = `${data.winner} Wins!\nOpponent eliminated`;
+                        break;
+                    case 'deck_empty_survival':
+                        commentaryMessage = `${data.winner} Wins!\nLast player standing`;
+                        break;
+                    case 'deck_empty_score':
+                        commentaryMessage = `${data.winner} Wins!\nHigher score`;
+                        break;
+                    default:
+                        commentaryMessage = `${data.winner} Wins!\n${reasonText}`;
+                }
+                showCommentary(commentaryMessage, 'victory');
+
                 addLogMessage(`GAME OVER! ${data.winner} WINS!`, 'success');
                 addLogMessage(`Victory condition: ${reasonText}`, 'success');
             } else {
+                // 引き分けの場合
+                showCommentary('Game Over\nDraw', 'draw');
                 addLogMessage(`Game Over! Draw (${data.reason})`, 'info');
             }
             updateUI();
