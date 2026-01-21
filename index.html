@@ -48,34 +48,34 @@
                             <!-- スロット1-9がJSで動的に生成される -->
                         </div>
 
-                        <!-- 実況表示エリア -->
-                        <aside id="commentary-area">
-                            <div id="commentary-messages">
-                                <!-- 実況メッセージがここに表示される -->
-                            </div>
-                        </aside>
+                        <div id="right-panel">
+                            <!-- 実況表示エリア -->
+                            <aside id="commentary-area">
+                                <div id="commentary-messages">
+                                    <!-- 実況メッセージがここに表示される -->
+                                </div>
+                            </aside>
+
+                            <!-- アクションボタン -->
+                            <section id="actions-section">
+                                <button id="btn-confirm-placement" class="btn btn-success" disabled>Place Card</button>
+                                <button id="btn-cancel-placement" class="btn btn-warning" disabled>Cancel</button>
+                            </section>
+                        </div>
                     </section>
 
                     <!-- Player 2 Area (下部) -->
                     <section id="player2-area" class="player-area">
-                        <div class="player2-content">
-                            <div class="player-header">
-                                <h2>Player 2</h2>
-                                <div id="player2-status" class="player-status">
-                                    <span class="hand-count">Hand: 13</span>
-                                    <span class="score">Score: 0</span>
-                                </div>
-                            </div>
-                            <div id="player2-hand" class="hand">
-                                <!-- Player 2の手札がここに表示される -->
+                        <div class="player-header">
+                            <h2>Player 2</h2>
+                            <div id="player2-status" class="player-status">
+                                <span class="hand-count">Hand: 13</span>
+                                <span class="score">Score: 0</span>
                             </div>
                         </div>
-
-                        <!-- アクションボタン -->
-                        <section id="actions-section">
-                            <button id="btn-confirm-placement" class="btn btn-success" disabled>Place Card</button>
-                            <button id="btn-cancel-placement" class="btn btn-warning" disabled>Cancel</button>
-                        </section>
+                        <div id="player2-hand" class="hand">
+                            <!-- Player 2の手札がここに表示される -->
+                        </div>
                     </section>
                 </div>
 
