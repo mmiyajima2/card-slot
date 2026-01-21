@@ -263,9 +263,10 @@ header #btn-new-game {
 #board-section {
     flex: 1;
     display: flex;
-    justify-content: center;
+    justify-content: flex-end;
     align-items: center;
     padding: 2rem;
+    padding-right: 3rem;
     gap: 1.5rem;
 }
 
@@ -517,14 +518,14 @@ header #btn-new-game {
     justify-content: flex-start;
     align-items: center;
     z-index: 1000;
-    padding-left: 2rem;
+    padding-left: 3rem;
 }
 
 .modal-content {
     background-color: var(--color-bg-light);
     padding: 2rem;
     border-radius: 12px;
-    max-width: 350px;
+    max-width: 400px;
     width: 100%;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
     border: 2px solid var(--color-accent);
