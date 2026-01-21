@@ -120,6 +120,19 @@ header #btn-new-game {
     border-color: #555;
 }
 
+/* Player 2エリアを横並びに */
+#player2-area {
+    display: flex;
+    gap: 1rem;
+    align-items: stretch;
+}
+
+.player2-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
 .player-header {
     display: flex;
     justify-content: space-between;
@@ -411,12 +424,11 @@ header #btn-new-game {
    Actions Section
    ======================================== */
 #actions-section {
-    background-color: var(--color-bg-light);
-    padding: 1rem;
-    border-radius: 8px;
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.75rem;
+    min-width: 140px;
+    justify-content: center;
 }
 
 .btn {
@@ -604,16 +616,10 @@ header #btn-new-game {
 
     #sidebar {
         width: 100%;
-        flex-direction: row;
     }
 
     #message-section {
-        flex: 1;
-    }
-
-    #actions-section {
-        flex-direction: row;
-        width: 250px;
+        max-height: 300px;
     }
 }
 
@@ -639,5 +645,18 @@ header #btn-new-game {
         width: 50px;
         height: 70px;
         font-size: 0.6rem;
+    }
+
+    #player2-area {
+        flex-direction: column;
+    }
+
+    #actions-section {
+        flex-direction: row;
+        min-width: unset;
+    }
+
+    #actions-section .btn {
+        flex: 1;
     }
 }

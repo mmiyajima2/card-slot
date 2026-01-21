@@ -51,20 +51,28 @@
 
                     <!-- Player 2 Area (下部) -->
                     <section id="player2-area" class="player-area">
-                        <div class="player-header">
-                            <h2>Player 2</h2>
-                            <div id="player2-status" class="player-status">
-                                <span class="hand-count">Hand: 13</span>
-                                <span class="score">Score: 0</span>
+                        <div class="player2-content">
+                            <div class="player-header">
+                                <h2>Player 2</h2>
+                                <div id="player2-status" class="player-status">
+                                    <span class="hand-count">Hand: 13</span>
+                                    <span class="score">Score: 0</span>
+                                </div>
+                            </div>
+                            <div id="player2-hand" class="hand">
+                                <!-- Player 2の手札がここに表示される -->
                             </div>
                         </div>
-                        <div id="player2-hand" class="hand">
-                            <!-- Player 2の手札がここに表示される -->
-                        </div>
+
+                        <!-- アクションボタン -->
+                        <section id="actions-section">
+                            <button id="btn-confirm-placement" class="btn btn-success" disabled>Place Card</button>
+                            <button id="btn-cancel-placement" class="btn btn-warning" disabled>Cancel</button>
+                        </section>
                     </section>
                 </div>
 
-                <!-- サイドバー: ゲームログとアクション -->
+                <!-- サイドバー: ゲームログ -->
                 <aside id="sidebar">
                     <!-- ゲームメッセージ・ログ -->
                     <section id="message-section">
@@ -72,12 +80,6 @@
                         <div id="game-log">
                             <p>Click "New Game" to start</p>
                         </div>
-                    </section>
-
-                    <!-- アクションボタン -->
-                    <section id="actions-section">
-                        <button id="btn-confirm-placement" class="btn btn-success" disabled>Place Card</button>
-                        <button id="btn-cancel-placement" class="btn btn-warning" disabled>Cancel</button>
                     </section>
                 </aside>
             </main>
