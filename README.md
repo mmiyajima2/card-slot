@@ -31,17 +31,17 @@ This repository contains the **game rules, implementation, and web deployment co
 
 ## Key Mechanics
 
-### Cards (71 Total)
+### Cards (52 Total)
 - **Rainbow 7** (5 cards): Rare card with instant win condition, negative score
-- **Silver 3** (8 cards): Powerful board control effect
+- **Silver 3** (5 cards): Powerful board control effect, ends game immediately
 - **Cherry** (8 cards): Pick 1 card from board
 - **Watermelon** (8 cards): Draw 2 cards from deck
-- **Bell** (21 cards): Draw 1 card from deck
-- **REPLAY** (21 cards): Automatic placement on lowest empty slot
+- **Bell** (13 cards): Draw 1 card from deck
+- **REPLAY** (13 cards): Automatic placement on lowest empty slot
 
 ### Victory Conditions
 1. **Rainbow 7 Line:** Three Rainbow 7 cards in a line (instant win)
-2. **Heavenly Hand:** Starting hand with 5 Rainbow 7s + 8 Silver 3s (instant win)
+2. **Heavenly Hand:** Starting hand with 5 Rainbow 7s + 5 Silver 3s (instant win)
 3. **Opponent Elimination:** Opponent runs out of cards
 4. **Deck Exhaustion:** Higher hand score when deck is empty
 
@@ -67,8 +67,11 @@ This repository contains the **game rules, implementation, and web deployment co
 
 Detailed game rules and specifications are available in:
 
-- **Game Specification (v1.0.1)**
+- **Game Specification (v1.1.0)**
   → `docs/specification.md`
+
+- **User Manual**
+  → `docs/manual_en.md` (English) / `docs/manual_ja.md` (Japanese)
 
 ※ Specifications are subject to change based on playtesting feedback.
 
