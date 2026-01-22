@@ -25,9 +25,9 @@
 When starting a game, you can choose between two modes:
 
 ### Solo Play
-- Two players take turns on the same device
-- Players alternate controlling their turns
-- Perfect for playing with friends or family
+- Control both players by yourself on the same device
+- Alternate between both sides each turn
+- Perfect for understanding game mechanics or studying strategies
 
 ### VS CPU
 - Play alone against the computer
@@ -348,7 +348,7 @@ When a line is completed, that card's effect activates.
 **A.** You lose immediately. This is an absolute rule.
 
 ### Q2. If multiple lines complete, do I resolve all of them?
-**A.** No, you **choose and resolve only 1 line**. The rest disappear.
+**A.** No, you **choose and resolve only 1 line**. Unselected lines remain on the board (however, other lines may break if the resolved line's cards are discarded).
 
 ### Q3. Must I resolve a line even if the effect is bad for me?
 **A.** Yes, line resolution is **mandatory** once completed.
