@@ -192,6 +192,12 @@
         gameManager.on('linesCompleted', (data) => {
             gameState.completedLines = data.lines;
 
+            // CPUターンの場合は、GameManagerの_handleCPULineResolutionで処理されるため、
+            // ここでは何もしない
+            if (gameManager.isCPUTurn()) {
+                return;
+            }
+
             // ラインが1つだけの場合は自動選択
             if (data.count === 1) {
                 addLogMessage(`Line completed! Resolving ${data.lines[0].symbol}...`, 'success');
@@ -454,20 +460,30 @@
         }
 
         // ステータス更新
-        statusElement.innerHTML = `
-            <span class="hand-count">Hand: ${playerData.handSize}</span>
-            <span class="score">Score: ${playerData.score}</span>
-        `;
+        // CPUかどうかをチェック（Player 1 かつ CPUモード）
+        const isCPU = gameManager.gameConfig.mode === 'cpu' && playerIndex === 0;
+        // ゲーム終了しているか
+        const gameEnded = state.phase === 'ended';
+
+        // CPUモードでCPUのスコアはゲーム終了まで非表示
+        const shouldShowScore = !isCPU || gameEnded || gameManager.gameConfig.mode === 'solo';
+
+        if (shouldShowScore) {
+            statusElement.innerHTML = `
+                <span class="hand-count">Hand: ${playerData.handSize}</span>
+                <span class="score">Score: ${playerData.score}</span>
+            `;
+        } else {
+            statusElement.innerHTML = `
+                <span class="hand-count">Hand: ${playerData.handSize}</span>
+            `;
+        }
 
         // 手札更新
         const player = gameManager.players[playerIndex];
         if (player && player.hand) {
             // 現在のターンのプレイヤーかどうかをチェック
             const isCurrentPlayer = (state.currentPlayer === playerData.name && state.phase !== 'ended');
-            // CPUかどうかをチェック（Player 1 かつ CPUモード）
-            const isCPU = gameManager.gameConfig.mode === 'cpu' && playerIndex === 0;
-            // ゲーム終了しているか
-            const gameEnded = state.phase === 'ended';
             renderHand(handElement, player.hand.cards, isCurrentPlayer, isCPU, gameEnded);
         }
     }
@@ -968,8 +984,10 @@
                 showCommentary('Cherry Effect\nNo cards to pick', 'effect');
                 resolveSelectedLine({ selectedSlots: [] });
             } else {
-                // 2枚以上ある場合は選択UIを表示
-                showCardSelectionUI(1, 'Cherry: Select up to 1 card from board');
+                // 2枚以上ある場合は選択UIを表示（CPUターンの場合はスキップ）
+                if (!gameManager.isCPUTurn()) {
+                    showCardSelectionUI(1, 'Cherry: Select up to 1 card from board');
+                }
             }
         } else {
             // それ以外はそのまま解決

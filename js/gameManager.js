@@ -535,7 +535,7 @@
 
             try {
                 // 初期待機
-                await CpuAI.sleep(CpuAI.randomBetween(500, 1000));
+                await CpuAI.sleep(CpuAI.randomBetween(1000, 2000));
 
                 // 1. カード選択
                 const selectedCard = CpuAI.selectCardToPlay(currentPlayer.hand, this.gamePhase);
@@ -549,7 +549,7 @@
                     card: { symbol: selectedCard.symbol }
                 });
 
-                await CpuAI.sleep(CpuAI.randomBetween(500, 1000));
+                await CpuAI.sleep(CpuAI.randomBetween(1000, 2000));
 
                 // 2. スロット選択
                 let selectedSlot = CpuAI.selectSlotForCard(this.board, selectedCard, this.gamePhase);
@@ -563,7 +563,7 @@
                             slot: discardSlot
                         });
 
-                        await CpuAI.sleep(CpuAI.randomBetween(300, 500));
+                        await CpuAI.sleep(CpuAI.randomBetween(600, 1000));
                         this.discardCardFromSlot(discardSlot);
 
                         // 捨て札後、再度スロット選択
@@ -581,7 +581,7 @@
                     slot: selectedSlot
                 });
 
-                await CpuAI.sleep(CpuAI.randomBetween(500, 800));
+                await CpuAI.sleep(CpuAI.randomBetween(1000, 1600));
 
                 // 3. カード配置
                 const placeResult = this.placeCard(selectedCard, selectedSlot);
@@ -607,7 +607,7 @@
          * CPUのライン解決処理（複数ライン、Cherry効果含む）
          */
         async _handleCPULineResolution(completedLines) {
-            await CpuAI.sleep(CpuAI.randomBetween(1000, 1500));
+            await CpuAI.sleep(CpuAI.randomBetween(2000, 3000));
 
             // ライン選択
             const selectedLine = CpuAI.selectLineToResolve(completedLines);
@@ -621,12 +621,17 @@
                 line: selectedLine
             });
 
-            await CpuAI.sleep(CpuAI.randomBetween(500, 800));
+            await CpuAI.sleep(CpuAI.randomBetween(1000, 1600));
 
             // Cherry効果の場合、カード選択が必要
             let options = {};
             if (selectedLine.symbol === SYMBOLS.CHERRY) {
-                const nonEmptySlots = [1, 2, 3, 4, 5, 6, 7, 8, 9].filter(slot => !this.board.isSlotEmpty(slot) && slot !== CENTER_SLOT);
+                // 完成したラインのスロットを除外して選択可能なスロットを取得
+                const nonEmptySlots = [1, 2, 3, 4, 5, 6, 7, 8, 9].filter(slot =>
+                    !this.board.isSlotEmpty(slot) &&
+                    slot !== CENTER_SLOT &&
+                    !selectedLine.slots.includes(slot)
+                );
 
                 if (nonEmptySlots.length > 0) {
                     const selectedSlots = CpuAI.selectCardsForCherry(nonEmptySlots, 1);
@@ -637,7 +642,7 @@
                         slots: selectedSlots
                     });
 
-                    await CpuAI.sleep(CpuAI.randomBetween(500, 800));
+                    await CpuAI.sleep(CpuAI.randomBetween(1000, 1600));
                 }
             }
 
