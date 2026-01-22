@@ -411,6 +411,15 @@ header #btn-new-game {
     white-space: pre-line;
 }
 
+/* 古いメッセージの透明度を下げる */
+.commentary-message.older {
+    opacity: 0.7;
+}
+
+.commentary-message.oldest {
+    opacity: 0.5;
+}
+
 @keyframes fadeIn {
     from {
         opacity: 0;

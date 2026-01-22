@@ -19,6 +19,9 @@
     // GameManagerのインスタンス
     let gameManager = null;
 
+    // 実況メッセージ履歴（最大3件、新しい順）
+    let commentaryHistory = [];
+
     // ゲーム状態
     let gameState = {
         selectedCard: null,           // 現在選択中のカード
@@ -205,9 +208,11 @@
                     if (validSlots.length === 1) {
                         // 有効なカードが1枚なら自動で取得
                         addLogMessage(`Cherry: Auto-selecting 1 card from board`, 'info');
+                        showCommentary('Cherry Effect\nAuto-picked 1 card', 'effect');
                         resolveSelectedLine({ selectedSlots: validSlots });
                     } else if (validSlots.length === 0) {
                         // 有効なカードがない場合はそのまま解決
+                        showCommentary('Cherry Effect\nNo cards to pick', 'effect');
                         resolveSelectedLine({ selectedSlots: [] });
                     } else {
                         // 2枚以上ある場合は選択UIを表示
@@ -243,8 +248,10 @@
             if (data.replayActionExecuted) {
                 if (data.replayCardPlaced) {
                     addLogMessage(`REPLAY: Drew ${data.replayCardPlaced.card.symbol} and placed on Slot ${data.replayCardPlaced.slot}`, 'info');
+                    showCommentary(`REPLAY Effect\nPlaced on Slot ${data.replayCardPlaced.slot}`, 'effect');
                 } else {
                     addLogMessage(`REPLAY: No empty slot available`, 'info');
+                    showCommentary('REPLAY Effect\nNo empty slot', 'effect');
                 }
             }
             updateUI();
@@ -555,22 +562,40 @@
 
     /**
      * 実況メッセージを表示（プレイヤー向け）
+     * 直近3件まで履歴を保持し、新しい順に表示
      * @param {string} message - メッセージ
      * @param {string} type - メッセージタイプ ('turn', 'effect')
      */
     function showCommentary(message, type = 'turn') {
         if (!elements.commentaryMessages) return;
 
-        // 新しいメッセージ要素を作成
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `commentary-message ${type}`;
-        messageDiv.textContent = message;
+        // 新しいメッセージを先頭に追加
+        commentaryHistory.unshift({ message, type });
 
-        // 既存のメッセージをクリア（常に最新の1件のみ表示）
+        // 3件を超えたら古いものを削除
+        if (commentaryHistory.length > 3) {
+            commentaryHistory.pop();
+        }
+
+        // 既存のメッセージをクリア
         elements.commentaryMessages.innerHTML = '';
 
-        // 新しいメッセージを追加
-        elements.commentaryMessages.appendChild(messageDiv);
+        // 履歴を新しい順に表示
+        commentaryHistory.forEach(({ message, type }, index) => {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `commentary-message ${type}`;
+
+            // 古いメッセージには追加のクラスを付与（透明度調整用）
+            if (index > 0) {
+                messageDiv.classList.add('older');
+            }
+            if (index > 1) {
+                messageDiv.classList.add('oldest');
+            }
+
+            messageDiv.textContent = message;
+            elements.commentaryMessages.appendChild(messageDiv);
+        });
     }
 
     /**
@@ -601,6 +626,8 @@
         if (elements.commentaryMessages) {
             elements.commentaryMessages.innerHTML = '';
         }
+        // 実況メッセージ履歴をクリア
+        commentaryHistory = [];
 
         // ゲーム状態をリセット
         gameState.selectedCard = null;
@@ -934,9 +961,11 @@
             if (validSlots.length === 1) {
                 // 有効なカードが1枚なら自動で取得
                 addLogMessage(`Cherry: Auto-selecting 1 card from board`, 'info');
+                showCommentary('Cherry Effect\nAuto-picked 1 card', 'effect');
                 resolveSelectedLine({ selectedSlots: validSlots });
             } else if (validSlots.length === 0) {
                 // 有効なカードがない場合はそのまま解決
+                showCommentary('Cherry Effect\nNo cards to pick', 'effect');
                 resolveSelectedLine({ selectedSlots: [] });
             } else {
                 // 2枚以上ある場合は選択UIを表示
