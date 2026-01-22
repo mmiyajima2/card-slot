@@ -215,8 +215,10 @@
                         showCommentary('Cherry Effect\nNo cards to pick', 'effect');
                         resolveSelectedLine({ selectedSlots: [] });
                     } else {
-                        // 2枚以上ある場合は選択UIを表示
-                        showCardSelectionUI(1, 'Cherry: Select up to 1 card from board');
+                        // 2枚以上ある場合は選択UIを表示（CPUターンの場合はスキップ）
+                        if (!gameManager.isCPUTurn()) {
+                            showCardSelectionUI(1, 'Cherry: Select up to 1 card from board');
+                        }
                     }
                 } else {
                     // それ以外はそのまま解決
@@ -978,8 +980,10 @@
                 showCommentary('Cherry Effect\nNo cards to pick', 'effect');
                 resolveSelectedLine({ selectedSlots: [] });
             } else {
-                // 2枚以上ある場合は選択UIを表示
-                showCardSelectionUI(1, 'Cherry: Select up to 1 card from board');
+                // 2枚以上ある場合は選択UIを表示（CPUターンの場合はスキップ）
+                if (!gameManager.isCPUTurn()) {
+                    showCardSelectionUI(1, 'Cherry: Select up to 1 card from board');
+                }
             }
         } else {
             // それ以外はそのまま解決

@@ -626,7 +626,12 @@
             // Cherry効果の場合、カード選択が必要
             let options = {};
             if (selectedLine.symbol === SYMBOLS.CHERRY) {
-                const nonEmptySlots = [1, 2, 3, 4, 5, 6, 7, 8, 9].filter(slot => !this.board.isSlotEmpty(slot) && slot !== CENTER_SLOT);
+                // 完成したラインのスロットを除外して選択可能なスロットを取得
+                const nonEmptySlots = [1, 2, 3, 4, 5, 6, 7, 8, 9].filter(slot =>
+                    !this.board.isSlotEmpty(slot) &&
+                    slot !== CENTER_SLOT &&
+                    !selectedLine.slots.includes(slot)
+                );
 
                 if (nonEmptySlots.length > 0) {
                     const selectedSlots = CpuAI.selectCardsForCherry(nonEmptySlots, 1);
