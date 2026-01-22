@@ -201,7 +201,7 @@
                     resolveSelectedLine({ selectedSlots: [] });
                 } else if (selectedLine.symbol === SYMBOLS.CHERRY) {
                     const validSlots = getValidSelectableSlots(selectedLine.slots);
-                    console.log('[DEBUG] Cherry - Valid slots:', validSlots, 'Count:', validSlots.length, 'Line slots:', selectedLine.slots);
+                    console.log('[DEBUG] Cherry - Valid slots:', validSlots, 'Count:', validSlots.length, 'Excluded line slots:', selectedLine.slots);
                     if (validSlots.length === 1) {
                         // 有効なカードが1枚なら自動で取得
                         addLogMessage(`Cherry: Auto-selecting 1 card from board`, 'info');
@@ -930,7 +930,7 @@
             resolveSelectedLine({ selectedSlots: [] });
         } else if (selectedLine.symbol === SYMBOLS.CHERRY) {
             const validSlots = getValidSelectableSlots(selectedLine.slots);
-            console.log('[DEBUG] Cherry (from line selection) - Valid slots:', validSlots, 'Count:', validSlots.length, 'Line slots:', selectedLine.slots);
+            console.log('[DEBUG] Cherry (from line selection) - Valid slots:', validSlots, 'Count:', validSlots.length, 'Excluded line slots:', selectedLine.slots);
             if (validSlots.length === 1) {
                 // 有効なカードが1枚なら自動で取得
                 addLogMessage(`Cherry: Auto-selecting 1 card from board`, 'info');
@@ -979,7 +979,7 @@
         elements.cardSelectionTitle.textContent = title;
         elements.cardSelectionOptions.innerHTML = '';
 
-        // 有効なスロットを取得（ラインのスロットを除外）
+        // 有効なスロットを取得（解決予定のラインのスロットを除外）
         const validSlotNumbers = getValidSelectableSlots(gameState.selectedLine.slots);
         const validSlots = validSlotNumbers.map(slotNumber => ({
             slotNumber,
