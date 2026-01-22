@@ -49,9 +49,11 @@
 
             // プレイヤーエリア
             player1Area: document.getElementById('player1-area'),
+            player1Name: document.getElementById('player1-name'),
             player1Hand: document.getElementById('player1-hand'),
             player1Status: document.getElementById('player1-status'),
             player2Area: document.getElementById('player2-area'),
+            player2Name: document.getElementById('player2-name'),
             player2Hand: document.getElementById('player2-hand'),
             player2Status: document.getElementById('player2-status'),
 
@@ -455,7 +457,11 @@
         if (player && player.hand) {
             // 現在のターンのプレイヤーかどうかをチェック
             const isCurrentPlayer = (state.currentPlayer === playerData.name && state.phase !== 'ended');
-            renderHand(handElement, player.hand.cards, isCurrentPlayer);
+            // CPUかどうかをチェック（Player 1 かつ CPUモード）
+            const isCPU = gameManager.gameConfig.mode === 'cpu' && playerIndex === 0;
+            // ゲーム終了しているか
+            const gameEnded = state.phase === 'ended';
+            renderHand(handElement, player.hand.cards, isCurrentPlayer, isCPU, gameEnded);
         }
     }
 
@@ -464,8 +470,10 @@
      * @param {HTMLElement} handElement - 手札の親要素
      * @param {Array} cards - カード配列
      * @param {boolean} isCurrentPlayer - 現在のターンのプレイヤーかどうか
+     * @param {boolean} isCPU - CPUかどうか
+     * @param {boolean} gameEnded - ゲームが終了しているか
      */
-    function renderHand(handElement, cards, isCurrentPlayer) {
+    function renderHand(handElement, cards, isCurrentPlayer, isCPU = false, gameEnded = false) {
         handElement.innerHTML = '';
 
         if (cards.length === 0) {
@@ -475,6 +483,16 @@
         }
 
         handElement.className = 'hand';
+
+        // CPUの手札は非公開（ゲーム終了時は公開）
+        if (isCPU && !gameEnded) {
+            handElement.className = 'hand cpu-hidden';
+            const hiddenMessage = document.createElement('div');
+            hiddenMessage.className = 'cpu-hand-hidden';
+            hiddenMessage.textContent = `${cards.length} card${cards.length !== 1 ? 's' : ''}`;
+            handElement.appendChild(hiddenMessage);
+            return;
+        }
 
         cards.forEach(card => {
             const cardElement = createCardElement(card);
@@ -602,8 +620,22 @@
             cpuLevel: 'easy'              // 現在は常に'easy'
         };
 
+        // プレイヤー名を設定
+        let player1Name, player2Name;
+        if (selectedMode === 'cpu') {
+            player1Name = 'CPU';
+            player2Name = 'You';
+            elements.player1Name.textContent = 'CPU';
+            elements.player2Name.textContent = 'You';
+        } else {
+            player1Name = 'Player 1';
+            player2Name = 'Player 2';
+            elements.player1Name.textContent = 'Player 1';
+            elements.player2Name.textContent = 'Player 2';
+        }
+
         // ゲーム開始
-        gameManager.startGame('Player 1', 'Player 2', gameConfig);
+        gameManager.startGame(player1Name, player2Name, gameConfig);
     }
 
     /**
