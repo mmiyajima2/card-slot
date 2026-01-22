@@ -41,7 +41,7 @@ This repository contains the **game rules, implementation, and web deployment co
 
 ### Victory Conditions
 1. **Rainbow 7 Line:** Three Rainbow 7 cards in a line (instant win)
-2. **Heavenly Hand:** Starting hand with 5 Rainbow 7s + 5 Silver 3s (instant win)
+2. **Miracle Hand:** Starting hand with 5 Rainbow 7s + 5 Silver 3s (instant win)
 3. **Opponent Elimination:** Opponent runs out of cards
 4. **Deck Exhaustion:** Higher hand score when deck is empty
 
