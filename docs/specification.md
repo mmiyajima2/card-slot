@@ -82,14 +82,14 @@ In addition, **Slots 3 and 7** are strategically important due to forced refresh
 
 ---
 
-### 6.2 Heavenly Hand (Rare Instant Win)
+### 6.2 Miracle Hand (Rare Instant Win)
 
 If a player's initial Hand consists of:
 
-- Rainbow 7 ×5  
-- Silver 3 ×5  
+- Rainbow 7 ×5
+- Silver 3 ×5
 
-That player may immediately declare **Heavenly Hand** and win.
+That player may immediately declare **Miracle Hand** and win.
 
 ---
 
