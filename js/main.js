@@ -19,6 +19,9 @@
     // GameManagerのインスタンス
     let gameManager = null;
 
+    // 実況メッセージ履歴（最大3件、新しい順）
+    let commentaryHistory = [];
+
     // ゲーム状態
     let gameState = {
         selectedCard: null,           // 現在選択中のカード
@@ -30,7 +33,9 @@
         selectableSlots: [],          // 選択可能なスロット
         selectedSlots: [],            // 選択済みスロット
         selectedLine: null,           // 選択されたライン
-        maxSelectableCards: 0         // 最大選択可能カード数
+        maxSelectableCards: 0,        // 最大選択可能カード数
+        discardTargetSlot: null,      // 捨てる予定のスロット番号
+        discardTargetCard: null       // 捨てる予定のカード
     };
 
     /**
@@ -47,20 +52,21 @@
 
             // プレイヤーエリア
             player1Area: document.getElementById('player1-area'),
+            player1Name: document.getElementById('player1-name'),
             player1Hand: document.getElementById('player1-hand'),
             player1Status: document.getElementById('player1-status'),
             player2Area: document.getElementById('player2-area'),
+            player2Name: document.getElementById('player2-name'),
             player2Hand: document.getElementById('player2-hand'),
             player2Status: document.getElementById('player2-status'),
 
-            // ゲームログ
-            gameLog: document.getElementById('game-log'),
+            // 実況表示エリア
+            commentaryMessages: document.getElementById('commentary-messages'),
 
             // アクションボタン
             btnNewGame: document.getElementById('btn-new-game'),
             btnConfirmPlacement: document.getElementById('btn-confirm-placement'),
             btnCancelPlacement: document.getElementById('btn-cancel-placement'),
-            btnEndTurn: document.getElementById('btn-end-turn'),
 
             // モーダル: ライン選択
             lineSelectionModal: document.getElementById('line-selection-modal'),
@@ -70,10 +76,18 @@
             // モーダル: カード選択
             cardSelectionModal: document.getElementById('card-selection-modal'),
             cardSelectionTitle: document.getElementById('card-selection-title'),
-            cardSelectionInstruction: document.getElementById('card-selection-instruction'),
-            boardCardSelection: document.getElementById('board-card-selection'),
+            cardSelectionOptions: document.getElementById('card-selection-options'),
             btnConfirmCards: document.getElementById('btn-confirm-cards'),
-            btnSkipCards: document.getElementById('btn-skip-cards')
+
+            // モーダル: 捨てカード確認
+            discardConfirmModal: document.getElementById('discard-confirm-modal'),
+            discardConfirmMessage: document.getElementById('discard-confirm-message'),
+            btnConfirmDiscard: document.getElementById('btn-confirm-discard'),
+            btnCancelDiscard: document.getElementById('btn-cancel-discard'),
+
+            // モーダル: ゲームモード選択
+            gameModeModal: document.getElementById('game-mode-modal'),
+            btnStartGame: document.getElementById('btn-start-game')
         };
     }
 
@@ -119,17 +133,20 @@
         // 配置キャンセルボタン
         elements.btnCancelPlacement.addEventListener('click', handleCancelPlacement);
 
-        // End Turnボタン
-        elements.btnEndTurn.addEventListener('click', handleEndTurn);
-
         // ライン選択確定ボタン
         elements.btnConfirmLine.addEventListener('click', handleConfirmLine);
 
         // カード選択確定ボタン
         elements.btnConfirmCards.addEventListener('click', handleConfirmCards);
 
-        // カード選択スキップボタン
-        elements.btnSkipCards.addEventListener('click', handleSkipCards);
+        // 捨てカード確定ボタン
+        elements.btnConfirmDiscard.addEventListener('click', handleConfirmDiscard);
+
+        // 捨てカードキャンセルボタン
+        elements.btnCancelDiscard.addEventListener('click', handleCancelDiscard);
+
+        // ゲーム開始ボタン（モーダル内）
+        elements.btnStartGame.addEventListener('click', handleStartGameFromModal);
     }
 
     /**
@@ -139,12 +156,14 @@
         // ゲーム開始イベント
         gameManager.on('gameStarted', (data) => {
             addLogMessage(`Game started! ${data.currentPlayer}'s turn`, 'success');
+            showCommentary(`${data.currentPlayer}'s Turn`, 'turn');
             updateUI();
         });
 
         // ターン開始イベント
         gameManager.on('turnStarted', (data) => {
             addLogMessage(`${data.player}'s turn started`, 'info');
+            showCommentary(`${data.player}'s Turn`, 'turn');
             updateUI();
         });
 
@@ -164,18 +183,59 @@
             updateUI();
         });
 
+        // カード捨てイベント
+        gameManager.on('cardDiscarded', (data) => {
+            addLogMessage(`${data.player} discarded ${data.discardedCard.display} from Slot ${data.slot}`, 'info');
+        });
+
         // ライン完成イベント
         gameManager.on('linesCompleted', (data) => {
-            addLogMessage(`${data.count} line(s) completed! Select one to resolve.`, 'success');
             gameState.completedLines = data.lines;
-            gameState.awaitingLineSelection = true;
-            showLineSelectionUI(data.lines);
+
+            // ラインが1つだけの場合は自動選択
+            if (data.count === 1) {
+                addLogMessage(`Line completed! Resolving ${data.lines[0].symbol}...`, 'success');
+                const selectedLine = data.lines[0];
+                gameState.selectedLine = selectedLine;
+
+                // Silver 3は即座にデッキを空にするため、カード選択不要
+                if (selectedLine.symbol === SYMBOLS.SILVER_3) {
+                    addLogMessage(`Silver 3: Discarding entire deck...`, 'info');
+                    resolveSelectedLine({ selectedSlots: [] });
+                } else if (selectedLine.symbol === SYMBOLS.CHERRY) {
+                    const validSlots = getValidSelectableSlots(selectedLine.slots);
+                    console.log('[DEBUG] Cherry - Valid slots:', validSlots, 'Count:', validSlots.length, 'Excluded line slots:', selectedLine.slots);
+                    if (validSlots.length === 1) {
+                        // 有効なカードが1枚なら自動で取得
+                        addLogMessage(`Cherry: Auto-selecting 1 card from board`, 'info');
+                        showCommentary('Cherry Effect\nAuto-picked 1 card', 'effect');
+                        resolveSelectedLine({ selectedSlots: validSlots });
+                    } else if (validSlots.length === 0) {
+                        // 有効なカードがない場合はそのまま解決
+                        showCommentary('Cherry Effect\nNo cards to pick', 'effect');
+                        resolveSelectedLine({ selectedSlots: [] });
+                    } else {
+                        // 2枚以上ある場合は選択UIを表示
+                        showCardSelectionUI(1, 'Cherry: Select up to 1 card from board');
+                    }
+                } else {
+                    // それ以外はそのまま解決
+                    resolveSelectedLine({});
+                }
+            } else {
+                // 複数ラインの場合は選択モーダルを表示
+                addLogMessage(`${data.count} line(s) completed! Select one to resolve.`, 'success');
+                gameState.awaitingLineSelection = true;
+                showLineSelectionUI(data.lines);
+            }
         });
 
         // ライン解決イベント
         gameManager.on('lineResolved', (data) => {
             if (data.instantWin) {
-                // instantWinの場合はgameEndedイベントで表示するため、ここでは何もしない
+                // 虹7が揃った時の実況メッセージ
+                showCommentary(`🌈 Rainbow 7 Line!\n${data.player} Wins!`, 'victory');
+                addLogMessage(`${data.player} completed Rainbow 7 line and wins!`, 'success');
                 return;
             }
             addLogMessage(`${data.player} resolved ${data.symbol} line`, 'success');
@@ -188,8 +248,10 @@
             if (data.replayActionExecuted) {
                 if (data.replayCardPlaced) {
                     addLogMessage(`REPLAY: Drew ${data.replayCardPlaced.card.symbol} and placed on Slot ${data.replayCardPlaced.slot}`, 'info');
+                    showCommentary(`REPLAY Effect\nPlaced on Slot ${data.replayCardPlaced.slot}`, 'effect');
                 } else {
                     addLogMessage(`REPLAY: No empty slot available`, 'info');
+                    showCommentary('REPLAY Effect\nNo empty slot', 'effect');
                 }
             }
             updateUI();
@@ -198,6 +260,7 @@
         // 強制リフレッシュイベント
         gameManager.on('forcedRefreshOccurred', (data) => {
             addLogMessage(`Forced Refresh! Slots 3 and 7 refreshed`, 'info');
+            showCommentary('Refresh Occurred', 'effect');
             data.refreshResults.forEach(r => {
                 if (r.removedCard) {
                     addLogMessage(`Slot ${r.slot}: ${r.removedCard.symbol} → ${r.placedCard.symbol}`, 'info');
@@ -206,10 +269,50 @@
             updateUI();
         });
 
+        // Deck枯渇時のスコア判定イベント
+        gameManager.on('deckEmptyScoreJudgment', (data) => {
+            const message = `Deck Empty! Score Judgment:\n${data.player1.name}: ${data.player1.score} pts\n${data.player2.name}: ${data.player2.score} pts\nWinner: ${data.winner}`;
+            showCommentary(message, 'score-result');
+            addLogMessage(message.replace(/\n/g, ' '), 'info');
+        });
+
+        // 手札枯渇による勝敗イベント
+        gameManager.on('handDepletionVictory', (data) => {
+            const message = `${data.eliminatedPlayer} ran out of cards!\n${data.winner} wins!`;
+            showCommentary(message, 'elimination-result');
+            addLogMessage(message.replace(/\n/g, ' '), 'info');
+        });
+
         // プレイヤー敗北イベント
         gameManager.on('playerEliminated', (data) => {
             addLogMessage(`${data.player} eliminated (${data.reason})`, 'error');
             updateUI();
+        });
+
+        // CPU関連イベント
+        gameManager.on('cpuCardSelected', (data) => {
+            addLogMessage(`${data.player} selected ${data.card.symbol}`, 'info');
+            showCommentary(`CPU selected\n${data.card.symbol}`, 'cpu-action');
+        });
+
+        gameManager.on('cpuSlotSelected', (data) => {
+            addLogMessage(`${data.player} will place on Slot ${data.slot}`, 'info');
+            showCommentary(`CPU places on\nSlot ${data.slot}`, 'cpu-action');
+        });
+
+        gameManager.on('cpuLineSelected', (data) => {
+            addLogMessage(`${data.player} selected line: ${data.line.symbol}`, 'info');
+            showCommentary(`CPU resolves\n${data.line.symbol}`, 'cpu-action');
+        });
+
+        gameManager.on('cpuCherryCardsSelected', (data) => {
+            addLogMessage(`${data.player} selected ${data.slots.length} card(s) from board`, 'info');
+            showCommentary(`CPU picks card\nfrom board`, 'cpu-action');
+        });
+
+        gameManager.on('cpuDiscardSelected', (data) => {
+            addLogMessage(`${data.player} will discard from Slot ${data.slot}`, 'info');
+            showCommentary(`CPU discards\nSlot ${data.slot}`, 'cpu-action');
         });
 
         // ゲーム終了イベント
@@ -225,9 +328,35 @@
                     'deck_empty_draw': 'Draw'
                 };
                 const reasonText = reasonMessages[data.reason] || data.reason;
+
+                // 実況エリアへの勝利メッセージ表示
+                let commentaryMessage = '';
+                switch (data.reason) {
+                    case 'rainbow_7_line':
+                        commentaryMessage = `🌈 Rainbow 7 Line!\n${data.winner} Wins!`;
+                        break;
+                    case 'heavenly_hand':
+                        commentaryMessage = `✨ Heavenly Hand!\n${data.winner} Wins!`;
+                        break;
+                    case 'opponent_eliminated':
+                        commentaryMessage = `${data.winner} Wins!\nOpponent eliminated`;
+                        break;
+                    case 'deck_empty_survival':
+                        commentaryMessage = `${data.winner} Wins!\nLast player standing`;
+                        break;
+                    case 'deck_empty_score':
+                        commentaryMessage = `${data.winner} Wins!\nHigher score`;
+                        break;
+                    default:
+                        commentaryMessage = `${data.winner} Wins!\n${reasonText}`;
+                }
+                showCommentary(commentaryMessage, 'victory');
+
                 addLogMessage(`GAME OVER! ${data.winner} WINS!`, 'success');
                 addLogMessage(`Victory condition: ${reasonText}`, 'success');
             } else {
+                // 引き分けの場合
+                showCommentary('Game Over\nDraw', 'draw');
                 addLogMessage(`Game Over! Draw (${data.reason})`, 'info');
             }
             updateUI();
@@ -254,7 +383,7 @@
         updatePlayerArea(1, state.players[1]);
 
         // ボタン更新
-        updateButtons(state);
+        updateButtons();
     }
 
     /**
@@ -333,7 +462,13 @@
         // 手札更新
         const player = gameManager.players[playerIndex];
         if (player && player.hand) {
-            renderHand(handElement, player.hand.cards);
+            // 現在のターンのプレイヤーかどうかをチェック
+            const isCurrentPlayer = (state.currentPlayer === playerData.name && state.phase !== 'ended');
+            // CPUかどうかをチェック（Player 1 かつ CPUモード）
+            const isCPU = gameManager.gameConfig.mode === 'cpu' && playerIndex === 0;
+            // ゲーム終了しているか
+            const gameEnded = state.phase === 'ended';
+            renderHand(handElement, player.hand.cards, isCurrentPlayer, isCPU, gameEnded);
         }
     }
 
@@ -341,8 +476,11 @@
      * 手札を描画
      * @param {HTMLElement} handElement - 手札の親要素
      * @param {Array} cards - カード配列
+     * @param {boolean} isCurrentPlayer - 現在のターンのプレイヤーかどうか
+     * @param {boolean} isCPU - CPUかどうか
+     * @param {boolean} gameEnded - ゲームが終了しているか
      */
-    function renderHand(handElement, cards) {
+    function renderHand(handElement, cards, isCurrentPlayer, isCPU = false, gameEnded = false) {
         handElement.innerHTML = '';
 
         if (cards.length === 0) {
@@ -353,9 +491,28 @@
 
         handElement.className = 'hand';
 
+        // CPUの手札は非公開（ゲーム終了時は公開）
+        if (isCPU && !gameEnded) {
+            handElement.className = 'hand cpu-hidden';
+            const hiddenMessage = document.createElement('div');
+            hiddenMessage.className = 'cpu-hand-hidden';
+            hiddenMessage.textContent = `${cards.length} card${cards.length !== 1 ? 's' : ''}`;
+            handElement.appendChild(hiddenMessage);
+            return;
+        }
+
         cards.forEach(card => {
             const cardElement = createCardElement(card);
-            cardElement.addEventListener('click', () => handleCardClick(card));
+
+            // 現在のターンのプレイヤーのみクリック可能
+            if (isCurrentPlayer) {
+                cardElement.addEventListener('click', () => handleCardClick(card));
+            } else {
+                cardElement.classList.add('disabled');
+                cardElement.style.pointerEvents = 'none';
+                cardElement.style.opacity = '0.6';
+            }
+
             handElement.appendChild(cardElement);
         });
     }
@@ -384,50 +541,93 @@
 
     /**
      * ボタンの有効/無効を更新
-     * @param {object} state - ゲーム状態
      */
-    function updateButtons(state) {
+    function updateButtons() {
         // Confirm Placementボタン: 仮配置中のみ有効
         elements.btnConfirmPlacement.disabled = !gameState.awaitingConfirmation;
 
         // Cancelボタン: 仮配置中のみ有効
         elements.btnCancelPlacement.disabled = !gameState.awaitingConfirmation;
-
-        // End Turnボタン: 仮配置中、ライン選択待ち、ゲーム終了時は無効
-        if (state.phase === 'ended' ||
-            gameState.awaitingConfirmation ||
-            gameState.awaitingLineSelection ||
-            gameState.awaitingCardSelection) {
-            elements.btnEndTurn.disabled = true;
-        } else {
-            elements.btnEndTurn.disabled = false;
-        }
     }
 
     /**
-     * ゲームログにメッセージを追加
+     * ゲームログにメッセージを追加（開発者向け・コンソールのみ）
      * @param {string} message - メッセージ
      * @param {string} type - メッセージタイプ ('info', 'success', 'error')
      */
     function addLogMessage(message, type = 'info') {
-        const p = document.createElement('p');
-        p.textContent = message;
-        p.className = type;
-        elements.gameLog.appendChild(p);
-        elements.gameLog.scrollTop = elements.gameLog.scrollHeight;
+        // コンソールにのみ出力
+        console.log(`[${type.toUpperCase()}] ${message}`);
+    }
+
+    /**
+     * 実況メッセージを表示（プレイヤー向け）
+     * 直近3件まで履歴を保持し、新しい順に表示
+     * @param {string} message - メッセージ
+     * @param {string} type - メッセージタイプ ('turn', 'effect')
+     */
+    function showCommentary(message, type = 'turn') {
+        if (!elements.commentaryMessages) return;
+
+        // 新しいメッセージを先頭に追加
+        commentaryHistory.unshift({ message, type });
+
+        // 3件を超えたら古いものを削除
+        if (commentaryHistory.length > 3) {
+            commentaryHistory.pop();
+        }
+
+        // 既存のメッセージをクリア
+        elements.commentaryMessages.innerHTML = '';
+
+        // 履歴を新しい順に表示
+        commentaryHistory.forEach(({ message, type }, index) => {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `commentary-message ${type}`;
+
+            // 古いメッセージには追加のクラスを付与（透明度調整用）
+            if (index > 0) {
+                messageDiv.classList.add('older');
+            }
+            if (index > 1) {
+                messageDiv.classList.add('oldest');
+            }
+
+            messageDiv.textContent = message;
+            elements.commentaryMessages.appendChild(messageDiv);
+        });
     }
 
     /**
      * New Gameボタンのハンドラ
      */
     function handleNewGame() {
+        // ゲームモード選択モーダルを表示
+        elements.gameModeModal.style.display = 'flex';
+    }
+
+    /**
+     * モーダルからのゲーム開始ハンドラ
+     */
+    function handleStartGameFromModal() {
+        // 選択されたゲームモードを取得
+        const selectedMode = document.querySelector('input[name="game-mode"]:checked').value;
+        const selectedFirstPlayer = document.querySelector('input[name="first-player"]:checked').value;
+
         // Google Analytics イベント送信
         if (globalThis.CardSlot && globalThis.CardSlot.Analytics) {
             globalThis.CardSlot.Analytics.trackNewGame();
         }
 
-        // ゲームログをクリア
-        elements.gameLog.innerHTML = '';
+        // モーダルを閉じる
+        elements.gameModeModal.style.display = 'none';
+
+        // 実況メッセージをクリア
+        if (elements.commentaryMessages) {
+            elements.commentaryMessages.innerHTML = '';
+        }
+        // 実況メッセージ履歴をクリア
+        commentaryHistory = [];
 
         // ゲーム状態をリセット
         gameState.selectedCard = null;
@@ -440,8 +640,29 @@
         gameState.selectedSlots = [];
         gameState.selectedLine = null;
 
+        // ゲーム設定オブジェクトを作成
+        const gameConfig = {
+            mode: selectedMode,           // 'solo' or 'cpu'
+            firstPlayer: parseInt(selectedFirstPlayer), // 1 or 2
+            cpuLevel: 'easy'              // 現在は常に'easy'
+        };
+
+        // プレイヤー名を設定
+        let player1Name, player2Name;
+        if (selectedMode === 'cpu') {
+            player1Name = 'CPU';
+            player2Name = 'You';
+            elements.player1Name.textContent = 'CPU';
+            elements.player2Name.textContent = 'You';
+        } else {
+            player1Name = 'Player 1';
+            player2Name = 'Player 2';
+            elements.player1Name.textContent = 'Player 1';
+            elements.player2Name.textContent = 'Player 2';
+        }
+
         // ゲーム開始
-        gameManager.startGame('Player 1', 'Player 2');
+        gameManager.startGame(player1Name, player2Name, gameConfig);
     }
 
     /**
@@ -463,18 +684,20 @@
             gameState.tentativePlacement = null;
             gameState.awaitingConfirmation = false;
 
-            // プレイヤー敗北チェック（手札0枚）
-            if (result.playerEliminated) {
-                updateUI();
-                return;
-            }
-
             // ライン完成チェック
             if (result.completedLines.length === 0) {
-                // ライン完成なし → ターン終了可能
-                addLogMessage('Placement confirmed. You can end your turn.', 'success');
+                // ライン完成なし → 手札0枚チェック後、ターン終了
+                const handCheckResult = gameManager.checkHandEmptyAfterLineResolution();
+                if (handCheckResult.playerEliminated) {
+                    updateUI();
+                    return;
+                }
+
+                addLogMessage('Card placed. Turn ended.', 'success');
+                updateUI();
+                gameManager.endTurn();
             }
-            // ライン完成時はイベント経由でモーダルが表示される
+            // ライン完成時はイベント経由でモーダルが表示され、解決後に自動的にターン終了
 
             // UI更新（ボタン状態を反映）
             updateUI();
@@ -507,18 +730,6 @@
     }
 
     /**
-     * End Turnボタンのハンドラ
-     */
-    function handleEndTurn() {
-        if (gameState.awaitingLineSelection || gameState.awaitingCardSelection) {
-            addLogMessage('Please complete line/card selection first', 'error');
-            return;
-        }
-
-        gameManager.endTurn();
-    }
-
-    /**
      * 手札カードクリックのハンドラ
      * @param {object} card - クリックされたカード
      */
@@ -527,6 +738,20 @@
 
         if (state.phase === 'ended') {
             addLogMessage('Game has ended', 'error');
+            return;
+        }
+
+        // CPUターン中は操作不可
+        if (gameManager.isCPUTurn()) {
+            addLogMessage('CPU is thinking...', 'info');
+            return;
+        }
+
+        // 念のため、自分のターンかどうかを再確認（二重チェック）
+        const currentPlayer = gameManager.getCurrentPlayer();
+        const clickedPlayerHand = gameManager.players.find(p => p.hand.cards.includes(card));
+        if (clickedPlayerHand !== currentPlayer) {
+            addLogMessage('It is not your turn', 'error');
             return;
         }
 
@@ -556,18 +781,46 @@
 
     /**
      * スロットクリックのハンドラ
+     * Board is full flow:
+     * 1) User clicks on a board slot (Slot 1-8 only, Slot 9 cannot be selected)
+     * 2) Confirmation dialog appears: "Discard [Card] from Slot X?"
+     * 3) If user confirms discard -> card is discarded, then user selects card from hand to place
+     *
      * @param {number} slotNumber - クリックされたスロット番号
      */
     function handleSlotClick(slotNumber) {
-        if (!gameState.selectedCard) {
-            addLogMessage('Please select a card from your hand first', 'error');
-            return;
-        }
-
         const state = gameManager.getGameState();
 
         if (state.phase === 'ended') {
             addLogMessage('Game has ended', 'error');
+            return;
+        }
+
+        // CPUターン中は操作不可
+        if (gameManager.isCPUTurn()) {
+            addLogMessage('CPU is thinking...', 'info');
+            return;
+        }
+
+        // ボード満杯時の処理
+        if (gameManager.board.isFull()) {
+            // Slot 9（中央）は捨てられない
+            if (slotNumber === CENTER_SLOT) {
+                addLogMessage('Cannot discard center slot (Slot 9)', 'error');
+                return;
+            }
+
+            // 捨てカード確認ダイアログを表示
+            const card = gameManager.board.getCard(slotNumber);
+            if (card) {
+                showDiscardConfirmDialog(slotNumber, card);
+            }
+            return;
+        }
+
+        // 通常の配置フロー（ボード満杯でない場合）
+        if (!gameState.selectedCard) {
+            addLogMessage('Please select a card from your hand first', 'error');
             return;
         }
 
@@ -587,9 +840,9 @@
 
         clearSelectedCard();
         updateBoard();
-        updateButtons(state);
+        updateButtons();
 
-        addLogMessage(`Card placed tentatively on Slot ${slotNumber}. Click "Confirm Placement" to finalize or "Cancel" to undo.`, 'info');
+        addLogMessage(`Card placed tentatively on Slot ${slotNumber}. Click "Place Card" to finalize or "Cancel" to undo.`, 'info');
     }
 
     /**
@@ -617,6 +870,33 @@
     }
 
     /**
+     * ボード上のラインをハイライト
+     * @param {Array} slots - スロット番号の配列
+     */
+    function highlightLineOnBoard(slots) {
+        // 既存のハイライトをクリア
+        clearBoardHighlight();
+
+        // 該当スロットにハイライトクラスを追加
+        slots.forEach(slotNumber => {
+            const slotElement = elements.board.querySelector(`[data-slot-number="${slotNumber}"]`);
+            if (slotElement) {
+                slotElement.classList.add('line-highlighted');
+            }
+        });
+    }
+
+    /**
+     * ボードのハイライトをクリア
+     */
+    function clearBoardHighlight() {
+        const highlightedSlots = elements.board.querySelectorAll('.slot.line-highlighted');
+        highlightedSlots.forEach(slot => {
+            slot.classList.remove('line-highlighted');
+        });
+    }
+
+    /**
      * ライン選択UIを表示
      * @param {Array} lines - 完成したライン配列
      */
@@ -639,6 +919,9 @@
                 document.querySelectorAll('.line-option').forEach(el => el.classList.remove('selected'));
                 option.classList.add('selected');
                 option.querySelector('input').checked = true;
+
+                // ボード上のラインをハイライト
+                highlightLineOnBoard(line.slots);
             });
 
             elements.lineOptions.appendChild(option);
@@ -661,15 +944,33 @@
         const selectedLine = gameState.completedLines[lineIndex];
         gameState.selectedLine = selectedLine;
 
+        // ハイライトをクリア
+        clearBoardHighlight();
+
         // モーダルを閉じる
         elements.lineSelectionModal.style.display = 'none';
         gameState.awaitingLineSelection = false;
 
-        // Silver 3 / Cherryの場合、カード選択UIを表示
+        // Silver 3は即座にデッキを空にするため、カード選択不要
         if (selectedLine.symbol === SYMBOLS.SILVER_3) {
-            showCardSelectionUI(2, 'Silver 3: Select up to 2 cards from board');
+            addLogMessage(`Silver 3: Discarding entire deck...`, 'info');
+            resolveSelectedLine({ selectedSlots: [] });
         } else if (selectedLine.symbol === SYMBOLS.CHERRY) {
-            showCardSelectionUI(1, 'Cherry: Select up to 1 card from board');
+            const validSlots = getValidSelectableSlots(selectedLine.slots);
+            console.log('[DEBUG] Cherry (from line selection) - Valid slots:', validSlots, 'Count:', validSlots.length, 'Excluded line slots:', selectedLine.slots);
+            if (validSlots.length === 1) {
+                // 有効なカードが1枚なら自動で取得
+                addLogMessage(`Cherry: Auto-selecting 1 card from board`, 'info');
+                showCommentary('Cherry Effect\nAuto-picked 1 card', 'effect');
+                resolveSelectedLine({ selectedSlots: validSlots });
+            } else if (validSlots.length === 0) {
+                // 有効なカードがない場合はそのまま解決
+                showCommentary('Cherry Effect\nNo cards to pick', 'effect');
+                resolveSelectedLine({ selectedSlots: [] });
+            } else {
+                // 2枚以上ある場合は選択UIを表示
+                showCardSelectionUI(1, 'Cherry: Select up to 1 card from board');
+            }
         } else {
             // それ以外はそのまま解決
             resolveSelectedLine({});
@@ -677,58 +978,94 @@
     }
 
     /**
+     * ボードから有効な選択可能スロットを取得（センタースロット以外）
+     * @param {number[]} excludeSlots - 除外するスロット番号の配列（解決するラインのスロットなど）
+     * @returns {number[]} 有効なスロット番号の配列
+     */
+    function getValidSelectableSlots(excludeSlots = []) {
+        const validSlots = [];
+        for (let slotNumber = 1; slotNumber <= 9; slotNumber++) {
+            if (slotNumber === CENTER_SLOT) continue;
+            if (excludeSlots.includes(slotNumber)) continue;
+            const card = gameManager.board.getCard(slotNumber);
+            if (card) {
+                validSlots.push(slotNumber);
+            }
+        }
+        return validSlots;
+    }
+
+    /**
      * カード選択UIを表示（Silver 3 / Cherry用）
-     * @param {number} maxSelect - 最大選択可能数
+     * @param {number} requiredCount - 必要な選択数（銀3=2, チェリー=1）
      * @param {string} title - タイトル
      */
-    function showCardSelectionUI(maxSelect, title) {
+    function showCardSelectionUI(requiredCount, title) {
         gameState.awaitingCardSelection = true;
-        gameState.maxSelectableCards = maxSelect;
+        gameState.maxSelectableCards = requiredCount;
         gameState.selectedSlots = [];
 
         elements.cardSelectionTitle.textContent = title;
-        elements.cardSelectionInstruction.textContent = `Select up to ${maxSelect} card(s). Slot 9 (center) cannot be selected.`;
+        elements.cardSelectionOptions.innerHTML = '';
 
-        // ボード上のカードを表示（Slot 9以外）
-        elements.boardCardSelection.innerHTML = '';
+        // 有効なスロットを取得（解決予定のラインのスロットを除外）
+        const validSlotNumbers = getValidSelectableSlots(gameState.selectedLine.slots);
+        const validSlots = validSlotNumbers.map(slotNumber => ({
+            slotNumber,
+            card: gameManager.board.getCard(slotNumber)
+        }));
 
-        for (let slotNumber = 1; slotNumber <= 9; slotNumber++) {
-            if (slotNumber === CENTER_SLOT) continue; // センタースロットは選択不可
+        // チェリー（1枚選択）の場合はラジオボタン、銀3（2枚選択）の場合はチェックボックス
+        const inputType = requiredCount === 1 ? 'radio' : 'checkbox';
+        const inputName = requiredCount === 1 ? 'card-slot' : '';
 
-            const card = gameManager.board.getCard(slotNumber);
-            if (card) {
-                const cardElement = createCardElement(card);
-                cardElement.classList.add('selectable');
-                cardElement.dataset.slotNumber = slotNumber;
-                cardElement.addEventListener('click', () => handleBoardCardClick(slotNumber, cardElement));
-                elements.boardCardSelection.appendChild(cardElement);
-            }
-        }
+        validSlots.forEach(({ slotNumber, card }) => {
+            const option = document.createElement('div');
+            option.className = 'card-option';
+            option.dataset.slotNumber = slotNumber;
+
+            const label = document.createElement('label');
+            const input = document.createElement('input');
+            input.type = inputType;
+            if (inputName) input.name = inputName;
+            input.value = slotNumber;
+            input.addEventListener('change', () => handleCardSlotSelection(requiredCount));
+
+            label.appendChild(input);
+            label.appendChild(document.createTextNode(` Slot ${slotNumber} - ${card.display}`));
+
+            option.appendChild(label);
+            elements.cardSelectionOptions.appendChild(option);
+        });
+
+        // Confirmボタンは初期状態で無効
+        elements.btnConfirmCards.disabled = true;
 
         elements.cardSelectionModal.style.display = 'flex';
     }
 
     /**
-     * ボードカード選択ハンドラ
-     * @param {number} slotNumber - スロット番号
-     * @param {HTMLElement} cardElement - カード要素
+     * カードスロット選択ハンドラ（チェックボックス/ラジオボタン用）
+     * @param {number} requiredCount - 必要な選択数
      */
-    function handleBoardCardClick(slotNumber, cardElement) {
-        const index = gameState.selectedSlots.indexOf(slotNumber);
+    function handleCardSlotSelection(requiredCount) {
+        // 現在選択されているスロットを取得
+        const selectedInputs = elements.cardSelectionOptions.querySelectorAll('input:checked');
+        const selectedSlots = Array.from(selectedInputs).map(input => parseInt(input.value));
 
-        if (index > -1) {
-            // 選択解除
-            gameState.selectedSlots.splice(index, 1);
-            cardElement.classList.remove('selected');
-        } else {
-            // 選択
-            if (gameState.selectedSlots.length >= gameState.maxSelectableCards) {
-                addLogMessage(`You can only select up to ${gameState.maxSelectableCards} card(s)`, 'error');
-                return;
+        gameState.selectedSlots = selectedSlots;
+
+        // ボード上のハイライトを更新
+        clearBoardHighlight();
+        selectedSlots.forEach(slot => {
+            const slotElement = elements.board.querySelector(`[data-slot-number="${slot}"]`);
+            if (slotElement) {
+                slotElement.classList.add('line-highlighted');
             }
-            gameState.selectedSlots.push(slotNumber);
-            cardElement.classList.add('selected');
-        }
+        });
+
+        // Confirmボタンの有効/無効を切り替え
+        elements.btnConfirmCards.disabled = selectedSlots.length !== requiredCount;
     }
 
     /**
@@ -738,18 +1075,8 @@
         // 選択されたスロットでライン解決
         resolveSelectedLine({ selectedSlots: gameState.selectedSlots });
 
-        // モーダルを閉じる
-        elements.cardSelectionModal.style.display = 'none';
-        gameState.awaitingCardSelection = false;
-        gameState.selectedSlots = [];
-    }
-
-    /**
-     * カード選択スキップハンドラ
-     */
-    function handleSkipCards() {
-        // スロット選択なしでライン解決
-        resolveSelectedLine({ selectedSlots: [] });
+        // ハイライトをクリア
+        clearBoardHighlight();
 
         // モーダルを閉じる
         elements.cardSelectionModal.style.display = 'none';
@@ -771,9 +1098,87 @@
             gameManager.resolveLine(gameState.selectedLine, options);
             gameState.selectedLine = null;
             gameState.completedLines = [];
+
+            // ライン解決後、手札0枚チェック
+            const handCheckResult = gameManager.checkHandEmptyAfterLineResolution();
+            if (handCheckResult.playerEliminated) {
+                updateUI();
+                return;
+            }
+
+            // ゲームが終了している場合はターン終了処理をスキップ
+            const currentState = gameManager.getGameState();
+            if (currentState.phase === 'ended') {
+                updateUI();
+                return;
+            }
+
+            // ライン解決後、自動的にターン終了
+            addLogMessage('Line resolved. Turn ended.', 'success');
+            updateUI();
+            gameManager.endTurn();
         } catch (error) {
             addLogMessage(`Error resolving line: ${error.message}`, 'error');
         }
+    }
+
+    /**
+     * 捨てカード確認ダイアログを表示
+     * @param {number} slotNumber - スロット番号
+     * @param {object} card - カードオブジェクト
+     */
+    function showDiscardConfirmDialog(slotNumber, card) {
+        gameState.discardTargetSlot = slotNumber;
+        gameState.discardTargetCard = card;
+
+        elements.discardConfirmMessage.textContent = `Discard ${card.display} from Slot ${slotNumber}?`;
+        elements.discardConfirmModal.style.display = 'flex';
+
+        addLogMessage(`Confirm to discard ${card.display} from Slot ${slotNumber}`, 'info');
+    }
+
+    /**
+     * 捨てカード確認ダイアログを閉じる
+     */
+    function hideDiscardConfirmDialog() {
+        elements.discardConfirmModal.style.display = 'none';
+        gameState.discardTargetSlot = null;
+        gameState.discardTargetCard = null;
+    }
+
+    /**
+     * 捨てカード確定ハンドラ
+     */
+    function handleConfirmDiscard() {
+        if (!gameState.discardTargetSlot) {
+            addLogMessage('No slot selected for discard', 'error');
+            return;
+        }
+
+        try {
+            // スロットのカードを捨て札に移動
+            const result = gameManager.discardCardFromSlot(gameState.discardTargetSlot);
+
+            // ダイアログを閉じる
+            hideDiscardConfirmDialog();
+
+            // UIを更新
+            updateUI();
+
+            // 手札から配置するカードを選択するよう促す
+            addLogMessage(`Slot ${gameState.discardTargetSlot} is now empty. Select a card from your hand to place.`, 'info');
+
+        } catch (error) {
+            addLogMessage(`Error: ${error.message}`, 'error');
+        }
+    }
+
+    /**
+     * 捨てカードキャンセルハンドラ
+     */
+    function handleCancelDiscard() {
+        hideDiscardConfirmDialog();
+        addLogMessage('Discard cancelled', 'info');
     }
 
     /**

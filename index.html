@@ -21,8 +21,10 @@
                 <h1>Card Slot</h1>
                 <div id="game-info">
                     <span id="current-player">Player 1's Turn</span>
-                    <span id="deck-count">Deck: 37</span>
+                    <span id="deck-count">Deck: -</span>
                 </div>
+                <button id="btn-new-game" class="btn btn-primary">New Game</button>
+                <a href="https://github.com/mmiyajima2/card-slot/blob/main/docs/manual_en.md" target="_blank" class="btn btn-secondary" id="btn-manual">Manual</a>
             </header>
 
             <main id="game-area">
@@ -30,7 +32,7 @@
                     <!-- Player 1 Area (上部) -->
                     <section id="player1-area" class="player-area">
                         <div class="player-header">
-                            <h2>Player 1</h2>
+                            <h2 id="player1-name">Player 1</h2>
                             <div id="player1-status" class="player-status">
                                 <span class="hand-count">Hand: 13</span>
                                 <span class="score">Score: 0</span>
@@ -46,12 +48,27 @@
                         <div id="board" class="board">
                             <!-- スロット1-9がJSで動的に生成される -->
                         </div>
+
+                        <div id="right-panel">
+                            <!-- 実況表示エリア -->
+                            <aside id="commentary-area">
+                                <div id="commentary-messages">
+                                    <!-- 実況メッセージがここに表示される -->
+                                </div>
+                            </aside>
+
+                            <!-- アクションボタン -->
+                            <section id="actions-section">
+                                <button id="btn-confirm-placement" class="btn btn-success" disabled>Place Card</button>
+                                <button id="btn-cancel-placement" class="btn btn-warning" disabled>Cancel</button>
+                            </section>
+                        </div>
                     </section>
 
                     <!-- Player 2 Area (下部) -->
                     <section id="player2-area" class="player-area">
                         <div class="player-header">
-                            <h2>Player 2</h2>
+                            <h2 id="player2-name">Player 2</h2>
                             <div id="player2-status" class="player-status">
                                 <span class="hand-count">Hand: 13</span>
                                 <span class="score">Score: 0</span>
@@ -63,25 +80,56 @@
                     </section>
                 </div>
 
-                <!-- サイドバー: ゲームログとアクション -->
+                <!-- サイドバー: 将来の拡張用 -->
                 <aside id="sidebar">
-                    <!-- ゲームメッセージ・ログ -->
-                    <section id="message-section">
-                        <h3>Game Log</h3>
-                        <div id="game-log">
-                            <p>Click "New Game" to start</p>
-                        </div>
-                    </section>
-
-                    <!-- アクションボタン -->
-                    <section id="actions-section">
-                        <button id="btn-new-game" class="btn btn-primary">New Game</button>
-                        <button id="btn-confirm-placement" class="btn btn-success" disabled>Confirm Placement</button>
-                        <button id="btn-cancel-placement" class="btn btn-warning" disabled>Cancel</button>
-                        <button id="btn-end-turn" class="btn btn-secondary" disabled>End Turn</button>
-                    </section>
+                    <!-- 将来のメニュー等に使用 -->
                 </aside>
             </main>
+
+            <!-- モーダル: ゲームモード選択 -->
+            <div id="game-mode-modal" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <h3>Game Mode Selection</h3>
+
+                    <div class="game-mode-section">
+                        <h4>Game Mode</h4>
+                        <div id="mode-options">
+                            <div class="mode-option">
+                                <label>
+                                    <input type="radio" name="game-mode" value="solo" checked>
+                                    Solo Play
+                                </label>
+                            </div>
+                            <div class="mode-option">
+                                <label>
+                                    <input type="radio" name="game-mode" value="cpu">
+                                    vs CPU (Easy)
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="game-mode-section">
+                        <h4>First Player</h4>
+                        <div id="first-player-options">
+                            <div class="mode-option">
+                                <label>
+                                    <input type="radio" name="first-player" value="1" checked>
+                                    Player 1
+                                </label>
+                            </div>
+                            <div class="mode-option">
+                                <label>
+                                    <input type="radio" name="first-player" value="2">
+                                    Player 2
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button id="btn-start-game" class="btn btn-primary">Start Game</button>
+                </div>
+            </div>
 
             <!-- モーダル: ライン選択 -->
             <div id="line-selection-modal" class="modal" style="display: none;">
@@ -98,26 +146,39 @@
             <div id="card-selection-modal" class="modal" style="display: none;">
                 <div class="modal-content">
                     <h3 id="card-selection-title">Select Cards from Board</h3>
-                    <p id="card-selection-instruction"></p>
-                    <div id="board-card-selection">
-                        <!-- 選択可能なカードがJSで動的に生成される -->
+                    <div id="card-selection-options">
+                        <!-- スロット選択肢がJSで動的に生成される -->
                     </div>
-                    <button id="btn-confirm-cards" class="btn btn-primary">Confirm</button>
-                    <button id="btn-skip-cards" class="btn btn-secondary">Skip</button>
+                    <button id="btn-confirm-cards" class="btn btn-primary" disabled>Confirm</button>
+                </div>
+            </div>
+
+            <!-- モーダル: ボード満杯時の捨てカード確認 -->
+            <div id="discard-confirm-modal" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <h3 id="discard-confirm-title">Discard Card</h3>
+                    <p id="discard-confirm-message">
+                        <!-- 動的に生成: Discard [Card] from Slot X? -->
+                    </p>
+                    <div class="modal-actions">
+                        <button id="btn-confirm-discard" class="btn btn-danger">Discard</button>
+                        <button id="btn-cancel-discard" class="btn btn-secondary">Cancel</button>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- JavaScriptファイルの読み込み（順序重要） -->
-        <script src="js/card.js?v=2"></script>
-        <script src="js/deck.js"></script>
-        <script src="js/board.js"></script>
-        <script src="js/hand.js"></script>
-        <script src="js/discardPile.js"></script>
-        <script src="js/player.js"></script>
-        <script src="js/lineEffectResolver.js"></script>
-        <script src="js/gameManager.js"></script>
-        <script src="js/analytics.js"></script>
-        <script src="js/main.js?v=2"></script>
+        <script src="js/card.js?v=1"></script>
+        <script src="js/deck.js?v=1"></script>
+        <script src="js/board.js?v=1"></script>
+        <script src="js/hand.js?v=1"></script>
+        <script src="js/discardPile.js?v=1"></script>
+        <script src="js/player.js?v=1"></script>
+        <script src="js/lineEffectResolver.js?v=1"></script>
+        <script src="js/cpuAI.js?v=1"></script>
+        <script src="js/gameManager.js?v=1"></script>
+        <script src="js/analytics.js?v=1"></script>
+        <script src="js/main.js?v=1"></script>
     </body>
 </html>

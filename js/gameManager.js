@@ -17,7 +17,8 @@
         Board,
         Hand,
         Player,
-        LineEffectResolver
+        LineEffectResolver,
+        CpuAI
     } = globalThis.CardSlot;
 
     class GameManager {
@@ -32,6 +33,13 @@
             this.lineEffectResolver = null;
             this.winner = null;
             this.winReason = null;
+
+            // ゲーム設定
+            this.gameConfig = {
+                mode: 'solo',      // 'solo' or 'cpu'
+                firstPlayer: 1,    // 1 or 2
+                cpuLevel: 'easy'   // 'easy', 'medium', 'hard'
+            };
 
             // イベントハンドラ管理
             this.eventHandlers = new Map();
@@ -73,8 +81,16 @@
          * ゲームを開始
          * @param {string} player1Name - プレイヤー1の名前
          * @param {string} player2Name - プレイヤー2の名前
+         * @param {object} config - ゲーム設定 { mode: 'solo'/'cpu', firstPlayer: 1/2, cpuLevel: 'easy'/'medium'/'hard' }
          */
-        startGame(player1Name = "Player 1", player2Name = "Player 2") {
+        startGame(player1Name = "Player 1", player2Name = "Player 2", config = {}) {
+            // ゲーム設定を更新
+            this.gameConfig = {
+                mode: config.mode || 'solo',
+                firstPlayer: config.firstPlayer || 1,
+                cpuLevel: config.cpuLevel || 'easy'
+            };
+
             // 初期化
             this.deck = Deck.createShuffledFullDeck();
             this.discardPile = new DiscardPile();
@@ -88,13 +104,14 @@
             player2.hand = new Hand(player2Name);
 
             this.players = [player1, player2];
-            this.currentPlayerIndex = 0;
+            // 先攻プレイヤーを設定（firstPlayerは1または2）
+            this.currentPlayerIndex = this.gameConfig.firstPlayer - 1;
             this.gamePhase = "setup";
             this.winner = null;
             this.winReason = null;
 
-            // 各プレイヤーに13枚配る
-            for (let i = 0; i < 13; i++) {
+            // 各プレイヤーに10枚配る
+            for (let i = 0; i < 10; i++) {
                 player1.hand.addCard(this.deck.draw());
                 player2.hand.addCard(this.deck.draw());
             }
@@ -121,6 +138,11 @@
             this.emit("firstTurnStarted", {
                 currentPlayer: this.getCurrentPlayer().name
             });
+
+            // CPUが先攻の場合、自動実行
+            if (this.isCPUTurn()) {
+                this._executeCPUTurn();
+            }
         }
 
         /**
@@ -132,7 +154,7 @@
                 const gold7Count = player.hand.countBySymbol(SYMBOLS.RAINBOW_7);
                 const silver3Count = player.hand.countBySymbol(SYMBOLS.SILVER_3);
 
-                if (gold7Count === 5 && silver3Count === 8) {
+                if (gold7Count === 5 && silver3Count === 5) {
                     return player;
                 }
             }
@@ -147,6 +169,16 @@
          */
         getCurrentPlayer() {
             return this.players[this.currentPlayerIndex];
+        }
+
+        /**
+         * 現在のターンがCPUかチェック
+         * @returns {boolean}
+         */
+        isCPUTurn() {
+            const result = this.gameConfig.mode === 'cpu' && this.currentPlayerIndex === 0;
+            console.log(`[isCPUTurn] mode=${this.gameConfig.mode}, currentPlayerIndex=${this.currentPlayerIndex}, result=${result}`);
+            return result;
         }
 
         /**
@@ -245,6 +277,11 @@
             if (refreshResult.gameEnded) {
                 return;
             }
+
+            // CPUターンなら自動実行
+            if (this.isCPUTurn()) {
+                this._executeCPUTurn();
+            }
         }
 
         // ==================== カード配置 ====================
@@ -316,29 +353,6 @@
                 handSize: currentPlayer.getHandSize()
             });
 
-            // 手札が0枚になったらチェック
-            if (currentPlayer.hasEmptyHand()) {
-                // Rainbow 7ラインが揃っているかチェック（即勝利が優先）
-                const hasRainbow7Line = this.board.hasRainbow7Line();
-                if (!hasRainbow7Line) {
-                    // 手札0枚で敗北
-                    currentPlayer.eliminate();
-                    this.emit("playerEliminated", {
-                        player: currentPlayer.name,
-                        reason: "hand_empty"
-                    });
-
-                    // 相手プレイヤーの勝利
-                    const opponent = this.players.find(p => p !== currentPlayer);
-                    this.endGame(opponent, "opponent_eliminated");
-                    return {
-                        success: true,
-                        completedLines: [],
-                        playerEliminated: true
-                    };
-                }
-            }
-
             // ライン完成チェック
             const completedLines = this.board.getCompletedLines();
 
@@ -356,12 +370,101 @@
 
             return {
                 success: true,
-                completedLines,
-                playerEliminated: false
+                completedLines
+            };
+        }
+
+        /**
+         * ボード満杯時：スロットのカードを捨て札に移動（ボード満杯時の捨てカード処理）
+         * Board is full flow:
+         * 1) User clicks on a board slot (Slot 1-8 only, Slot 9 cannot be selected)
+         * 2) Confirmation dialog appears: "Discard [Card] from Slot X?"
+         * 3) If user confirms discard:
+         *    - Discard the card from that slot
+         *    - User then selects a card from hand to place on the now-empty slot
+         *
+         * @param {number} slot - スロット番号（1-8のみ）
+         * @returns {object} { success: boolean, discardedCard: object }
+         */
+        discardCardFromSlot(slot) {
+            // バリデーション
+            if (this.gamePhase === "ended") {
+                throw new Error("Game has ended");
+            }
+
+            if (slot === CENTER_SLOT) {
+                throw new Error("Cannot discard center slot (Slot 9)");
+            }
+
+            const card = this.board.getCard(slot);
+            if (!card) {
+                throw new Error(`Slot ${slot} is empty, cannot discard`);
+            }
+
+            // 捨て札に移動
+            this.discardPile.addCard(card);
+
+            // ボードから削除
+            this.board.removeCard(slot);
+
+            // イベント発火
+            this.emit("cardDiscarded", {
+                player: this.getCurrentPlayer().name,
+                slot,
+                discardedCard: { symbol: card.symbol, display: card.display }
+            });
+
+            return {
+                success: true,
+                discardedCard: card
             };
         }
 
         // ==================== ライン解決 ====================
+
+        /**
+         * ライン解決後の手札0枚チェック
+         * ライン効果が適用された後に呼び出すこと
+         * @returns {object} { playerEliminated: boolean, winner: Player|null }
+         */
+        checkHandEmptyAfterLineResolution() {
+            const currentPlayer = this.getCurrentPlayer();
+
+            // 手札が0枚になったらチェック
+            if (currentPlayer.hasEmptyHand()) {
+                // Rainbow 7ラインが揃っているかチェック（即勝利が優先）
+                const hasRainbow7Line = this.board.hasRainbow7Line();
+                if (!hasRainbow7Line) {
+                    // 手札0枚で敗北
+                    currentPlayer.eliminate();
+
+                    // 相手プレイヤーの勝利
+                    const opponent = this.players.find(p => p !== currentPlayer);
+
+                    // 手札枯渇による勝敗イベントを発行（実況エリア用）
+                    this.emit("handDepletionVictory", {
+                        eliminatedPlayer: currentPlayer.name,
+                        winner: opponent.name
+                    });
+
+                    this.emit("playerEliminated", {
+                        player: currentPlayer.name,
+                        reason: "hand_empty"
+                    });
+
+                    this.endGame(opponent, "opponent_eliminated");
+                    return {
+                        playerEliminated: true,
+                        winner: opponent
+                    };
+                }
+            }
+
+            return {
+                playerEliminated: false,
+                winner: null
+            };
+        }
 
         /**
          * ラインを解決
@@ -390,6 +493,17 @@
                 return result;
             }
 
+            // 銀3によるデッキ枯渇チェック
+            if (result.deckEmpty) {
+                this.emit("lineResolved", {
+                    player: currentPlayer.name,
+                    symbol: result.symbol,
+                    deckEmpty: true
+                });
+                this._endGameByDeckEmpty();
+                return result;
+            }
+
             // ライン解決イベント
             this.emit("lineResolved", {
                 player: currentPlayer.name,
@@ -405,6 +519,144 @@
             // Replay Actionでライン完成しても評価しない（仕様通り）
 
             return result;
+        }
+
+        // ==================== CPU ターン実行 ====================
+
+        /**
+         * CPUターンを実行（非同期）
+         */
+        async _executeCPUTurn() {
+            if (this.gamePhase === "ended") {
+                return;
+            }
+
+            const currentPlayer = this.getCurrentPlayer();
+
+            try {
+                // 初期待機
+                await CpuAI.sleep(CpuAI.randomBetween(500, 1000));
+
+                // 1. カード選択
+                const selectedCard = CpuAI.selectCardToPlay(currentPlayer.hand, this.gamePhase);
+                if (!selectedCard) {
+                    console.error('[CPU] Failed to select card');
+                    return;
+                }
+
+                this.emit("cpuCardSelected", {
+                    player: currentPlayer.name,
+                    card: { symbol: selectedCard.symbol }
+                });
+
+                await CpuAI.sleep(CpuAI.randomBetween(500, 1000));
+
+                // 2. スロット選択
+                let selectedSlot = CpuAI.selectSlotForCard(this.board, selectedCard, this.gamePhase);
+
+                // ボード満杯の場合、捨て札処理
+                if (selectedSlot === null && this.board.isFull()) {
+                    const discardSlot = CpuAI.selectSlotToDiscard(this.board);
+                    if (discardSlot) {
+                        this.emit("cpuDiscardSelected", {
+                            player: currentPlayer.name,
+                            slot: discardSlot
+                        });
+
+                        await CpuAI.sleep(CpuAI.randomBetween(300, 500));
+                        this.discardCardFromSlot(discardSlot);
+
+                        // 捨て札後、再度スロット選択
+                        selectedSlot = CpuAI.selectSlotForCard(this.board, selectedCard, this.gamePhase);
+                    }
+                }
+
+                if (!selectedSlot) {
+                    console.error('[CPU] Failed to select slot');
+                    return;
+                }
+
+                this.emit("cpuSlotSelected", {
+                    player: currentPlayer.name,
+                    slot: selectedSlot
+                });
+
+                await CpuAI.sleep(CpuAI.randomBetween(500, 800));
+
+                // 3. カード配置
+                const placeResult = this.placeCard(selectedCard, selectedSlot);
+
+                // 4. ライン解決処理
+                if (placeResult.completedLines.length > 0) {
+                    await this._handleCPULineResolution(placeResult.completedLines);
+                } else {
+                    // ライン完成なし：手札空チェックとターン終了
+                    const handCheck = this.checkHandEmptyAfterLineResolution();
+                    if (handCheck.playerEliminated) {
+                        return;
+                    }
+                    this.endTurn();
+                }
+
+            } catch (error) {
+                console.error('[CPU] Error during turn execution:', error);
+            }
+        }
+
+        /**
+         * CPUのライン解決処理（複数ライン、Cherry効果含む）
+         */
+        async _handleCPULineResolution(completedLines) {
+            await CpuAI.sleep(CpuAI.randomBetween(1000, 1500));
+
+            // ライン選択
+            const selectedLine = CpuAI.selectLineToResolve(completedLines);
+            if (!selectedLine) {
+                console.error('[CPU] Failed to select line');
+                return;
+            }
+
+            this.emit("cpuLineSelected", {
+                player: this.getCurrentPlayer().name,
+                line: selectedLine
+            });
+
+            await CpuAI.sleep(CpuAI.randomBetween(500, 800));
+
+            // Cherry効果の場合、カード選択が必要
+            let options = {};
+            if (selectedLine.symbol === SYMBOLS.CHERRY) {
+                const nonEmptySlots = [1, 2, 3, 4, 5, 6, 7, 8, 9].filter(slot => !this.board.isSlotEmpty(slot) && slot !== CENTER_SLOT);
+
+                if (nonEmptySlots.length > 0) {
+                    const selectedSlots = CpuAI.selectCardsForCherry(nonEmptySlots, 1);
+                    options = { selectedSlots };
+
+                    this.emit("cpuCherryCardsSelected", {
+                        player: this.getCurrentPlayer().name,
+                        slots: selectedSlots
+                    });
+
+                    await CpuAI.sleep(CpuAI.randomBetween(500, 800));
+                }
+            }
+
+            // ライン解決実行
+            const resolveResult = this.resolveLine(selectedLine, options);
+
+            // ゲーム終了チェック（Rainbow 7 or Silver 3）
+            if (resolveResult.instantWin || resolveResult.deckEmpty) {
+                return;
+            }
+
+            // 手札空チェック
+            const handCheck = this.checkHandEmptyAfterLineResolution();
+            if (handCheck.playerEliminated) {
+                return;
+            }
+
+            // ターン終了
+            this.endTurn();
         }
 
         // ==================== 勝敗判定 ====================
@@ -433,6 +685,21 @@
             const player2 = activePlayers[1];
             const score1 = player1.getScore();
             const score2 = player2.getScore();
+
+            // スコア判定イベントを発行（実況エリア用）
+            this.emit('deckEmptyScoreJudgment', {
+                player1: {
+                    name: player1.name,
+                    score: score1
+                },
+                player2: {
+                    name: player2.name,
+                    score: score2
+                },
+                winner: score1 > score2 ? player1.name :
+                        score2 > score1 ? player2.name :
+                        'Draw'
+            });
 
             if (score1 > score2) {
                 this.endGame(player1, "deck_empty_score");

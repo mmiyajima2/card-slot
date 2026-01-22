@@ -33,7 +33,7 @@
         },
         [SYMBOLS.SILVER_3]: {
             symbol: SYMBOLS.SILVER_3,
-            count: 8,
+            count: 5,
             score: -1,
             display: "Silver 3",
             image: "assets/silver_3.svg",
@@ -54,14 +54,14 @@
         },
         [SYMBOLS.BELL]: {
             symbol: SYMBOLS.BELL,
-            count: 21,
+            count: 13,
             score: 1,
             display: "Bell",
             image: "assets/bell.svg",
         },
         [SYMBOLS.REPLAY]: {
             symbol: SYMBOLS.REPLAY,
-            count: 21,
+            count: 13,
             score: 0,
             display: "REPLAY",
             image: "assets/replay.svg",
