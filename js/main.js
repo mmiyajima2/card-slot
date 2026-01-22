@@ -280,6 +280,32 @@
             updateUI();
         });
 
+        // CPU関連イベント
+        gameManager.on('cpuCardSelected', (data) => {
+            addLogMessage(`${data.player} selected ${data.card.symbol}`, 'info');
+            showCommentary(`CPU selected\n${data.card.symbol}`, 'cpu-action');
+        });
+
+        gameManager.on('cpuSlotSelected', (data) => {
+            addLogMessage(`${data.player} will place on Slot ${data.slot}`, 'info');
+            showCommentary(`CPU places on\nSlot ${data.slot}`, 'cpu-action');
+        });
+
+        gameManager.on('cpuLineSelected', (data) => {
+            addLogMessage(`${data.player} selected line: ${data.line.symbol}`, 'info');
+            showCommentary(`CPU resolves\n${data.line.symbol}`, 'cpu-action');
+        });
+
+        gameManager.on('cpuCherryCardsSelected', (data) => {
+            addLogMessage(`${data.player} selected ${data.slots.length} card(s) from board`, 'info');
+            showCommentary(`CPU picks card\nfrom board`, 'cpu-action');
+        });
+
+        gameManager.on('cpuDiscardSelected', (data) => {
+            addLogMessage(`${data.player} will discard from Slot ${data.slot}`, 'info');
+            showCommentary(`CPU discards\nSlot ${data.slot}`, 'cpu-action');
+        });
+
         // ゲーム終了イベント
         gameManager.on('gameEnded', (data) => {
             if (data.winner) {
@@ -656,6 +682,12 @@
             return;
         }
 
+        // CPUターン中は操作不可
+        if (gameManager.isCPUTurn()) {
+            addLogMessage('CPU is thinking...', 'info');
+            return;
+        }
+
         // 念のため、自分のターンかどうかを再確認（二重チェック）
         const currentPlayer = gameManager.getCurrentPlayer();
         const clickedPlayerHand = gameManager.players.find(p => p.hand.cards.includes(card));
@@ -702,6 +734,12 @@
 
         if (state.phase === 'ended') {
             addLogMessage('Game has ended', 'error');
+            return;
+        }
+
+        // CPUターン中は操作不可
+        if (gameManager.isCPUTurn()) {
+            addLogMessage('CPU is thinking...', 'info');
             return;
         }
 

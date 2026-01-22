@@ -17,7 +17,8 @@
         Board,
         Hand,
         Player,
-        LineEffectResolver
+        LineEffectResolver,
+        CpuAI
     } = globalThis.CardSlot;
 
     class GameManager {
@@ -137,6 +138,11 @@
             this.emit("firstTurnStarted", {
                 currentPlayer: this.getCurrentPlayer().name
             });
+
+            // CPUが先攻の場合、自動実行
+            if (this.isCPUTurn()) {
+                this._executeCPUTurn();
+            }
         }
 
         /**
@@ -163,6 +169,16 @@
          */
         getCurrentPlayer() {
             return this.players[this.currentPlayerIndex];
+        }
+
+        /**
+         * 現在のターンがCPUかチェック
+         * @returns {boolean}
+         */
+        isCPUTurn() {
+            const result = this.gameConfig.mode === 'cpu' && this.currentPlayerIndex === 0;
+            console.log(`[isCPUTurn] mode=${this.gameConfig.mode}, currentPlayerIndex=${this.currentPlayerIndex}, result=${result}`);
+            return result;
         }
 
         /**
@@ -260,6 +276,11 @@
             const refreshResult = this.beforePlayerTurn();
             if (refreshResult.gameEnded) {
                 return;
+            }
+
+            // CPUターンなら自動実行
+            if (this.isCPUTurn()) {
+                this._executeCPUTurn();
             }
         }
 
@@ -498,6 +519,144 @@
             // Replay Actionでライン完成しても評価しない（仕様通り）
 
             return result;
+        }
+
+        // ==================== CPU ターン実行 ====================
+
+        /**
+         * CPUターンを実行（非同期）
+         */
+        async _executeCPUTurn() {
+            if (this.gamePhase === "ended") {
+                return;
+            }
+
+            const currentPlayer = this.getCurrentPlayer();
+
+            try {
+                // 初期待機
+                await CpuAI.sleep(CpuAI.randomBetween(500, 1000));
+
+                // 1. カード選択
+                const selectedCard = CpuAI.selectCardToPlay(currentPlayer.hand, this.gamePhase);
+                if (!selectedCard) {
+                    console.error('[CPU] Failed to select card');
+                    return;
+                }
+
+                this.emit("cpuCardSelected", {
+                    player: currentPlayer.name,
+                    card: { symbol: selectedCard.symbol }
+                });
+
+                await CpuAI.sleep(CpuAI.randomBetween(500, 1000));
+
+                // 2. スロット選択
+                let selectedSlot = CpuAI.selectSlotForCard(this.board, selectedCard, this.gamePhase);
+
+                // ボード満杯の場合、捨て札処理
+                if (selectedSlot === null && this.board.isFull()) {
+                    const discardSlot = CpuAI.selectSlotToDiscard(this.board);
+                    if (discardSlot) {
+                        this.emit("cpuDiscardSelected", {
+                            player: currentPlayer.name,
+                            slot: discardSlot
+                        });
+
+                        await CpuAI.sleep(CpuAI.randomBetween(300, 500));
+                        this.discardCardFromSlot(discardSlot);
+
+                        // 捨て札後、再度スロット選択
+                        selectedSlot = CpuAI.selectSlotForCard(this.board, selectedCard, this.gamePhase);
+                    }
+                }
+
+                if (!selectedSlot) {
+                    console.error('[CPU] Failed to select slot');
+                    return;
+                }
+
+                this.emit("cpuSlotSelected", {
+                    player: currentPlayer.name,
+                    slot: selectedSlot
+                });
+
+                await CpuAI.sleep(CpuAI.randomBetween(500, 800));
+
+                // 3. カード配置
+                const placeResult = this.placeCard(selectedCard, selectedSlot);
+
+                // 4. ライン解決処理
+                if (placeResult.completedLines.length > 0) {
+                    await this._handleCPULineResolution(placeResult.completedLines);
+                } else {
+                    // ライン完成なし：手札空チェックとターン終了
+                    const handCheck = this.checkHandEmptyAfterLineResolution();
+                    if (handCheck.playerEliminated) {
+                        return;
+                    }
+                    this.endTurn();
+                }
+
+            } catch (error) {
+                console.error('[CPU] Error during turn execution:', error);
+            }
+        }
+
+        /**
+         * CPUのライン解決処理（複数ライン、Cherry効果含む）
+         */
+        async _handleCPULineResolution(completedLines) {
+            await CpuAI.sleep(CpuAI.randomBetween(1000, 1500));
+
+            // ライン選択
+            const selectedLine = CpuAI.selectLineToResolve(completedLines);
+            if (!selectedLine) {
+                console.error('[CPU] Failed to select line');
+                return;
+            }
+
+            this.emit("cpuLineSelected", {
+                player: this.getCurrentPlayer().name,
+                line: selectedLine
+            });
+
+            await CpuAI.sleep(CpuAI.randomBetween(500, 800));
+
+            // Cherry効果の場合、カード選択が必要
+            let options = {};
+            if (selectedLine.symbol === SYMBOLS.CHERRY) {
+                const nonEmptySlots = [1, 2, 3, 4, 5, 6, 7, 8, 9].filter(slot => !this.board.isSlotEmpty(slot) && slot !== CENTER_SLOT);
+
+                if (nonEmptySlots.length > 0) {
+                    const selectedSlots = CpuAI.selectCardsForCherry(nonEmptySlots, 1);
+                    options = { selectedSlots };
+
+                    this.emit("cpuCherryCardsSelected", {
+                        player: this.getCurrentPlayer().name,
+                        slots: selectedSlots
+                    });
+
+                    await CpuAI.sleep(CpuAI.randomBetween(500, 800));
+                }
+            }
+
+            // ライン解決実行
+            const resolveResult = this.resolveLine(selectedLine, options);
+
+            // ゲーム終了チェック（Rainbow 7 or Silver 3）
+            if (resolveResult.instantWin || resolveResult.deckEmpty) {
+                return;
+            }
+
+            // 手札空チェック
+            const handCheck = this.checkHandEmptyAfterLineResolution();
+            if (handCheck.playerEliminated) {
+                return;
+            }
+
+            // ターン終了
+            this.endTurn();
         }
 
         // ==================== 勝敗判定 ====================
