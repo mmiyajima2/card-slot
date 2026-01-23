@@ -37,7 +37,7 @@ This repository contains the **game rules, implementation, and web deployment co
 - **Cherry** (8 cards): Pick 1 card from board
 - **Watermelon** (8 cards): Draw 2 cards from deck
 - **Bell** (13 cards): Draw 1 card from deck
-- **REPLAY** (13 cards): Automatic placement on lowest empty slot
+- **REPLAY** (13 cards): Discard up to 3 cards from deck
 
 ### Victory Conditions
 1. **Rainbow 7 Line:** Three Rainbow 7 cards in a line (instant win)

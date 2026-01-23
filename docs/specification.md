@@ -1,5 +1,5 @@
 # Card Slot
-**Game Specification (v1.1.0)**
+**Game Specification (v1.1.1)**
 
 ---
 
@@ -197,10 +197,17 @@ If the Board is completely filled at the start of a turn:
 
 ## 10. Replay Action
 
-1. Draw the top card of the Deck
-2. Place it on the empty Slot with the lowest number
-3. No Line effects are evaluated
+1. Discard cards from the top of the Deck, one at a time, **up to 3 cards**
+2. Discarding stops early if the Deck becomes empty
+3. **If the Deck reaches 0 cards during this process, the game ends immediately**
 4. Replay Actions do not chain
+5. No cards are drawn or placed on the Board
+6. No Line effects are evaluated
+
+**Notes**
+
+- This action represents replaying and discarding the current outcome
+- Replay does not directly affect the Board or Hands
 
 ---
 
