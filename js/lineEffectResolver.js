@@ -143,35 +143,40 @@
 
         /**
          * REPLAY効果: リプレイアクション
-         * 1. デッキから1枚ドロー
-         * 2. 最も小さい番号の空スロットに配置
-         * 3. ライン効果は評価しない
+         * 1. デッキから最大3枚まで、1枚ずつ捨て札に移動
+         * 2. デッキが空になったら即座に中断
+         * 3. デッキが0枚になった場合、ゲーム終了
+         * 4. リプレイアクションは連鎖しない
+         * 5. カードはボードに配置されない
+         * 6. ライン効果は評価されない
          */
         _resolveReplayEffect(result) {
             result.replayActionExecuted = true;
+            result.cardsDiscarded = 0;
 
-            // デッキが空の場合は何もしない
-            if (this.deck.isEmpty()) {
-                return;
-            }
+            // 最大3枚まで処理
+            for (let i = 0; i < 3; i++) {
+                // デッキが空ならループを抜ける
+                if (this.deck.isEmpty()) {
+                    break;
+                }
 
-            // デッキから1枚ドロー
-            const card = this.deck.draw();
-            if (!card) {
-                return;
-            }
+                // デッキから1枚ドロー
+                const card = this.deck.draw();
+                if (!card) {
+                    break;
+                }
 
-            // 最も小さい番号の空スロットを取得
-            const lowestEmptySlot = this.board.getLowestEmptySlot();
-            if (lowestEmptySlot === null) {
-                // 空スロットがない場合、カードを捨て札に移動
+                // 捨て札に移動
                 this.discardPile.add(card);
-                return;
-            }
+                result.cardsDiscarded++;
 
-            // カードを配置
-            this.board.placeCard(lowestEmptySlot, card);
-            result.replayCardPlaced = { slot: lowestEmptySlot, card };
+                // デッキが空になったらゲーム終了フラグを立てる
+                if (this.deck.isEmpty()) {
+                    result.deckEmpty = true;
+                    break;
+                }
+            }
         }
 
         /**

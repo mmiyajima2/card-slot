@@ -643,35 +643,46 @@ Each test case should be executed by a single tester controlling both players al
 **Objective:** Verify REPLAY effect executes replay action
 
 **Test Steps:**
-1. Form a REPLAY line
-2. Resolve the line
-3. Verify 3 REPLAY cards are discarded
-4. Verify replay action begins:
-   - 1 card is drawn from deck
-   - Card is placed on the lowest numbered empty slot
-5. Verify no line effects are triggered from the replay placement
+1. Note current deck count (e.g., 40 cards)
+2. Form a REPLAY line
+3. Resolve the line
+4. Verify 3 REPLAY cards are discarded to discard pile
+5. Verify replay action begins:
+   - Up to 3 cards are discarded from deck, one at a time
+   - Cards go directly to discard pile (not placed on board)
+6. Verify deck count decreased by 3 (or fewer if deck became empty)
+7. Verify no cards were placed on board
+8. Verify no line effects are triggered
 
 **Expected Result:**
 - Three REPLAY cards are discarded
-- 1 card drawn and placed automatically
-- Placed on lowest empty slot
+- Up to 3 additional cards discarded from deck
+- No cards placed on board
+- Deck counter decreases correctly
 - No line effects trigger from replay
 
 **Status:** [ ]
 
 ---
 
-### TC071: REPLAY - Places on Lowest Empty Slot
-**Objective:** Verify replay places card on correct slot
+### TC071: REPLAY - Discard Count Based on Deck Size
+**Objective:** Verify replay discards correct number based on deck size
 
 **Test Steps:**
-1. Empty Slots 3, 5, 7 (for example)
-2. Form a REPLAY line
-3. Resolve the line
-4. Verify replay places card on Slot 3 (lowest of 3, 5, 7)
+1. Play until deck has exactly 2 cards
+2. Note current deck and discard pile counts
+3. Form a REPLAY line
+4. Resolve the line
+5. Verify only 2 cards are discarded from deck (not 3, because deck became empty)
+6. Verify deck is now empty
+7. Verify game ends immediately
+8. Verify UI shows "Discarded 2 card(s)"
 
 **Expected Result:**
-- Card is placed on the lowest numbered empty slot
+- Only available cards are discarded (2 in this case)
+- Deck becomes empty
+- Game ends due to deck depletion
+- Message reflects actual number of cards discarded
 
 **Status:** [ ]
 
@@ -683,13 +694,14 @@ Each test case should be executed by a single tester controlling both players al
 **Test Steps:**
 1. Form a REPLAY line
 2. Resolve the line
-3. Replay places a card that would form another REPLAY line
-4. Verify the new REPLAY line does NOT automatically resolve
+3. Verify replay discards up to 3 cards from deck
+4. Verify no additional REPLAY actions are triggered
 5. Verify game continues to next player's turn
 
 **Expected Result:**
-- REPLAY does not trigger another REPLAY
-- Formed lines remain for next turn resolution
+- REPLAY executes exactly once
+- No cascading REPLAY actions
+- Discarded cards do not trigger effects
 - No infinite loops
 
 **Status:** [ ]
@@ -703,10 +715,14 @@ Each test case should be executed by a single tester controlling both players al
 1. Play until deck has 0 cards
 2. Form a REPLAY line (if board state allows)
 3. Resolve the line
-4. Verify game ends (deck was already empty)
+4. Verify 0 cards are discarded
+5. Verify UI message shows "Deck was empty"
+6. Verify game has already ended or ends due to empty deck
 
 **Expected Result:**
-- Replay cannot draw from empty deck
+- Replay cannot discard from empty deck
+- 0 cards discarded
+- Appropriate message displayed
 - Game ends due to empty deck
 
 **Status:** [ ]
