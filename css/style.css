@@ -363,6 +363,39 @@ header #btn-new-game {
     }
 }
 
+/* 強制リフレッシュエフェクト */
+.slot.forced-refresh {
+    animation: forcedRefreshPulse 1.5s ease-in-out;
+}
+
+@keyframes forcedRefreshPulse {
+    0% {
+        transform: scale(1);
+        border-color: var(--color-border);
+        box-shadow: 0 0 0 rgba(243, 156, 18, 0);
+    }
+    25% {
+        transform: scale(1.1);
+        border-color: #f39c12;
+        box-shadow: 0 0 30px rgba(243, 156, 18, 0.8);
+    }
+    50% {
+        transform: scale(1.05);
+        border-color: #e67e22;
+        box-shadow: 0 0 40px rgba(230, 126, 34, 1);
+    }
+    75% {
+        transform: scale(1.1);
+        border-color: #f39c12;
+        box-shadow: 0 0 30px rgba(243, 156, 18, 0.8);
+    }
+    100% {
+        transform: scale(1);
+        border-color: var(--color-border);
+        box-shadow: 0 0 0 rgba(243, 156, 18, 0);
+    }
+}
+
 /* ========================================
    Commentary Area (実況表示エリア)
    ======================================== */
