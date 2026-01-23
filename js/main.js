@@ -114,6 +114,11 @@
                     slot.classList.add('center');
                 }
 
+                // Slot 3と7に特殊スロットクラスを追加
+                if (slotNumber === 3 || slotNumber === 7) {
+                    slot.classList.add('special-slot');
+                }
+
                 slot.addEventListener('click', () => handleSlotClick(slotNumber));
                 elements.board.appendChild(slot);
             });
@@ -273,6 +278,18 @@
                 }
             });
             updateUI();
+
+            // スロット3と7に視覚効果を適用
+            data.refreshResults.forEach(r => {
+                const slotElement = elements.board.querySelector(`[data-slot-number="${r.slot}"]`);
+                if (slotElement) {
+                    slotElement.classList.add('forced-refresh');
+                    // 1.5秒後にクラスを削除
+                    setTimeout(() => {
+                        slotElement.classList.remove('forced-refresh');
+                    }, 1500);
+                }
+            });
         });
 
         // Deck枯渇時のスコア判定イベント
@@ -408,10 +425,21 @@
             const isTentative = gameState.tentativePlacement &&
                                gameState.tentativePlacement.slot === slotNumber;
 
+            // forced-refreshクラスを保持するために確認
+            const hasForcedRefresh = slotElement.classList.contains('forced-refresh');
+
             if (card || isTentative) {
                 slotElement.className = 'slot occupied';
                 if (slotNumber === CENTER_SLOT) {
                     slotElement.classList.add('center');
+                }
+                // Slot 3と7に特殊スロットクラスを再適用
+                if (slotNumber === 3 || slotNumber === 7) {
+                    slotElement.classList.add('special-slot');
+                }
+                // forced-refreshクラスを再適用
+                if (hasForcedRefresh) {
+                    slotElement.classList.add('forced-refresh');
                 }
                 slotElement.innerHTML = '';
 
@@ -428,6 +456,14 @@
                 slotElement.className = 'slot empty';
                 if (slotNumber === CENTER_SLOT) {
                     slotElement.classList.add('center');
+                }
+                // Slot 3と7に特殊スロットクラスを再適用
+                if (slotNumber === 3 || slotNumber === 7) {
+                    slotElement.classList.add('special-slot');
+                }
+                // forced-refreshクラスを再適用
+                if (hasForcedRefresh) {
+                    slotElement.classList.add('forced-refresh');
                 }
                 slotElement.innerHTML = '';
             }

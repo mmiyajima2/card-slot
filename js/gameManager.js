@@ -280,7 +280,14 @@
 
             // CPUターンなら自動実行
             if (this.isCPUTurn()) {
-                this._executeCPUTurn();
+                // 強制リフレッシュが発生した場合、エフェクトを見せるために少し待機
+                if (refreshResult.occurred) {
+                    setTimeout(() => {
+                        this._executeCPUTurn();
+                    }, 1800); // エフェクト1.5秒 + 余裕0.3秒
+                } else {
+                    this._executeCPUTurn();
+                }
             }
         }
 
