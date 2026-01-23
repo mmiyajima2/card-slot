@@ -62,7 +62,7 @@ The deck contains **52 cards** total, with 6 different symbols.
 | **Cherry** | 8 | Pick 1 card from the board | +1 |
 | **Watermelon** | 8 | Draw 2 cards from deck | +2 |
 | **Bell** | 13 | Draw 1 card from deck | +1 |
-| **REPLAY** | 13 | Automatically place 1 card | 0 |
+| **REPLAY** | 13 | Discard up to 3 cards from deck | 0 |
 
 ### Card Characteristics
 
@@ -91,10 +91,10 @@ The deck contains **52 cards** total, with 6 different symbols.
 - **Stability**: Draw 1 card to maintain your hand
 - **Balanced**: Safe with +1 score
 
-#### REPLAY - Auto Placement
-- **Chain Action**: Automatically places a card on the board
-- **Lowest Number First**: Places on the lowest-numbered empty slot
-- **No Effect**: The placed card's line effect doesn't activate
+#### REPLAY - Deck Discard
+- **Deck Reduction**: Discards up to 3 cards from the top of the deck
+- **No Placement**: Does not place cards on the board
+- **No Effect**: No line effects are evaluated
 - **Score 0**: Safe to keep in hand
 
 ---
@@ -294,15 +294,18 @@ When a line is completed, that card's effect activates.
 2. Execute **Replay Action**
 
 #### What is Replay Action?
-1. Draw 1 card from the top of the deck
-2. Place it on the **lowest-numbered empty slot**
-3. Line effects do not activate from this placement
+1. Discard cards from the top of the deck, one at a time, **up to 3 cards**
+2. Discarding stops early if the deck becomes empty
+3. **If the deck reaches 0 cards during this process, the game ends immediately**
 4. Replay Actions do not chain
+5. No cards are drawn or placed on the board
+6. No line effects are evaluated
 
 **Strategic Points**:
-- Fills the board
-- Placement location is predictable
-- Advances the board without spending hand cards
+- Reduces the deck quickly
+- Represents replaying and discarding the current outcome
+- Does not directly affect the board or hands
+- Can be used to accelerate game ending
 
 ---
 
@@ -364,8 +367,8 @@ When a line is completed, that card's effect activates.
 ### Q7. What if the deck runs out during Forced Refresh?
 **A.** The game ends immediately when the deck reaches 0.
 
-### Q8. If a line completes from REPLAY placement, does it activate?
-**A.** No, line effects do not activate during Replay Action.
+### Q8. What happens if the deck runs out during REPLAY?
+**A.** The game ends immediately when the deck reaches 0 during Replay Action.
 
 ### Q9. If I win with Rainbow 7 but my hand becomes empty?
 **A.** Rainbow 7 instant win takes priority. You win.
