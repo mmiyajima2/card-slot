@@ -114,6 +114,11 @@
                     slot.classList.add('center');
                 }
 
+                // Slot 3と7に特殊スロットクラスを追加
+                if (slotNumber === 3 || slotNumber === 7) {
+                    slot.classList.add('special-slot');
+                }
+
                 slot.addEventListener('click', () => handleSlotClick(slotNumber));
                 elements.board.appendChild(slot);
             });
@@ -428,6 +433,10 @@
                 if (slotNumber === CENTER_SLOT) {
                     slotElement.classList.add('center');
                 }
+                // Slot 3と7に特殊スロットクラスを再適用
+                if (slotNumber === 3 || slotNumber === 7) {
+                    slotElement.classList.add('special-slot');
+                }
                 // forced-refreshクラスを再適用
                 if (hasForcedRefresh) {
                     slotElement.classList.add('forced-refresh');
@@ -447,6 +456,10 @@
                 slotElement.className = 'slot empty';
                 if (slotNumber === CENTER_SLOT) {
                     slotElement.classList.add('center');
+                }
+                // Slot 3と7に特殊スロットクラスを再適用
+                if (slotNumber === 3 || slotNumber === 7) {
+                    slotElement.classList.add('special-slot');
                 }
                 // forced-refreshクラスを再適用
                 if (hasForcedRefresh) {

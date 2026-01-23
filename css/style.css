@@ -315,6 +315,11 @@ header #btn-new-game {
 .slot.center {
     border-color: var(--color-accent);
     box-shadow: 0 0 15px rgba(233, 69, 96, 0.3);
+    background-color: rgba(233, 69, 96, 0.25);
+}
+
+.slot.special-slot {
+    background-color: rgba(83, 52, 131, 0.25);
 }
 
 .slot .card {
