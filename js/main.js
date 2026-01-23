@@ -260,6 +260,16 @@
                 if (data.replayCardPlaced) {
                     addLogMessage(`REPLAY: Drew ${data.replayCardPlaced.card.symbol} and placed on Slot ${data.replayCardPlaced.slot}`, 'info');
                     showCommentary(`REPLAY Effect\nPlaced on Slot ${data.replayCardPlaced.slot}`, 'effect');
+
+                    // リプレイ配置カードに視覚効果を適用（強制リフレッシュと同じエフェクト）
+                    const slotElement = elements.board.querySelector(`[data-slot-number="${data.replayCardPlaced.slot}"]`);
+                    if (slotElement) {
+                        slotElement.classList.add('forced-refresh');
+                        // 1.5秒後にクラスを削除
+                        setTimeout(() => {
+                            slotElement.classList.remove('forced-refresh');
+                        }, 1500);
+                    }
                 } else {
                     addLogMessage(`REPLAY: No empty slot available`, 'info');
                     showCommentary('REPLAY Effect\nNo empty slot', 'effect');
