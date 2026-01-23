@@ -328,7 +328,6 @@ When a line is completed, that card's effect activates.
 ### When to Use Silver 3
 - When your hand score is high
 - When opponent has few cards
-- When you want to eliminate Rainbow 7 from your hand
 
 ### Line Selection Tactics
 - Choose carefully when multiple lines complete

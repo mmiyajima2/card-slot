@@ -260,6 +260,16 @@
                 if (data.replayCardPlaced) {
                     addLogMessage(`REPLAY: Drew ${data.replayCardPlaced.card.symbol} and placed on Slot ${data.replayCardPlaced.slot}`, 'info');
                     showCommentary(`REPLAY Effect\nPlaced on Slot ${data.replayCardPlaced.slot}`, 'effect');
+
+                    // リプレイ配置カードに視覚効果を適用（強制リフレッシュと同じエフェクト）
+                    const slotElement = elements.board.querySelector(`[data-slot-number="${data.replayCardPlaced.slot}"]`);
+                    if (slotElement) {
+                        slotElement.classList.add('forced-refresh');
+                        // 1.5秒後にクラスを削除
+                        setTimeout(() => {
+                            slotElement.classList.remove('forced-refresh');
+                        }, 1500);
+                    }
                 } else {
                     addLogMessage(`REPLAY: No empty slot available`, 'info');
                     showCommentary('REPLAY Effect\nNo empty slot', 'effect');
@@ -428,7 +438,27 @@
             // forced-refreshクラスを保持するために確認
             const hasForcedRefresh = slotElement.classList.contains('forced-refresh');
 
-            if (card || isTentative) {
+            // カード選択待ち（Cherry/Silver 3）で、成立ラインのスロットかチェック
+            const isResolvedLine = gameState.awaitingCardSelection &&
+                                   gameState.selectedLine &&
+                                   gameState.selectedLine.slots.includes(slotNumber);
+
+            // 成立ラインのスロットは空スロットとして表示
+            if (isResolvedLine) {
+                slotElement.className = 'slot empty';
+                if (slotNumber === CENTER_SLOT) {
+                    slotElement.classList.add('center');
+                }
+                // Slot 3と7に特殊スロットクラスを再適用
+                if (slotNumber === 3 || slotNumber === 7) {
+                    slotElement.classList.add('special-slot');
+                }
+                // forced-refreshクラスを再適用
+                if (hasForcedRefresh) {
+                    slotElement.classList.add('forced-refresh');
+                }
+                slotElement.innerHTML = '';
+            } else if (card || isTentative) {
                 slotElement.className = 'slot occupied';
                 if (slotNumber === CENTER_SLOT) {
                     slotElement.classList.add('center');
@@ -1096,6 +1126,9 @@
         elements.btnConfirmCards.disabled = true;
 
         elements.cardSelectionModal.style.display = 'flex';
+
+        // ボードを更新して、成立ラインのカードを非表示にする
+        updateBoard();
     }
 
     /**
