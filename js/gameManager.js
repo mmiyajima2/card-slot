@@ -110,8 +110,8 @@
             this.winner = null;
             this.winReason = null;
 
-            // 各プレイヤーに10枚配る
-            for (let i = 0; i < 10; i++) {
+            // 各プレイヤーに13枚配る
+            for (let i = 0; i < 13; i++) {
                 player1.hand.addCard(this.deck.draw());
                 player2.hand.addCard(this.deck.draw());
             }

@@ -149,7 +149,7 @@ A line is completed when three cards with the same symbol are aligned:
 ## Game Setup
 
 1. Shuffle all 52 cards to create the deck
-2. Deal **10 cards** to each player (this is your starting hand)
+2. Deal **13 cards** to each player (this is your starting hand)
 3. Place remaining cards face-down as the deck
 4. Prepare a discard pile area
 5. Determine first player (rock-paper-scissors, etc.)

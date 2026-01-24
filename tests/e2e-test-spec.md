@@ -523,7 +523,7 @@ Each test case should be executed by a single tester controlling both players al
 
 **Test Steps:**
 1. Note current deck count (e.g., 40 cards remaining)
-2. Note current hand count (e.g., 10 cards)
+2. Note current hand count (e.g., 13 cards)
 3. Form a Watermelon line
 4. Resolve the line
 5. Verify 3 Watermelon cards are discarded
