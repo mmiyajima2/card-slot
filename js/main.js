@@ -344,7 +344,6 @@
             if (data.winner) {
                 const reasonMessages = {
                     'rainbow_7_line': 'Rainbow 7 Line completed',
-                    'heavenly_hand': 'Heavenly Hand',
                     'opponent_eliminated': 'Opponent eliminated',
                     'deck_empty_survival': 'Last player standing',
                     'deck_empty_score': 'Higher score',
@@ -358,9 +357,6 @@
                 switch (data.reason) {
                     case 'rainbow_7_line':
                         commentaryMessage = `🌈 Rainbow 7 Line!\n${data.winner} Wins!`;
-                        break;
-                    case 'heavenly_hand':
-                        commentaryMessage = `✨ Heavenly Hand!\n${data.winner} Wins!`;
                         break;
                     case 'opponent_eliminated':
                         commentaryMessage = `${data.winner} Wins!\nOpponent eliminated`;
