@@ -326,6 +326,10 @@
                 throw new Error("Card not found in player's hand");
             }
 
+            // カード配置前の完成ラインを取得
+            const linesBeforePlacement = this.board.getCompletedLines();
+            const lineIndicesBeforePlacement = new Set(linesBeforePlacement.map(line => line.lineIndex));
+
             // ボードに配置
             this.board.placeCard(slot, card);
 
@@ -337,24 +341,29 @@
                 handSize: currentPlayer.getHandSize()
             });
 
-            // ライン完成チェック
-            const completedLines = this.board.getCompletedLines();
+            // カード配置後の完成ラインを取得
+            const linesAfterPlacement = this.board.getCompletedLines();
 
-            if (completedLines.length > 0) {
+            // 新しく成立したラインのみを抽出（配置前には存在せず、配置後に存在するライン）
+            const newlyCompletedLines = linesAfterPlacement.filter(
+                line => !lineIndicesBeforePlacement.has(line.lineIndex)
+            );
+
+            if (newlyCompletedLines.length > 0) {
                 // ライン完成イベント
                 this.emit("linesCompleted", {
                     player: currentPlayer.name,
-                    lines: completedLines.map(line => ({
+                    lines: newlyCompletedLines.map(line => ({
                         symbol: line.symbol,
                         slots: line.slots
                     })),
-                    count: completedLines.length
+                    count: newlyCompletedLines.length
                 });
             }
 
             return {
                 success: true,
-                completedLines
+                completedLines: newlyCompletedLines
             };
         }
 
