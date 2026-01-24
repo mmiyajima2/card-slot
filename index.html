@@ -45,17 +45,10 @@
 
                     <!-- ボード (3x3グリッド) -->
                     <section id="board-section">
-                        <div id="board" class="board">
-                            <!-- スロット1-9がJSで動的に生成される -->
-                        </div>
-
-                        <div id="right-panel">
-                            <!-- 実況表示エリア -->
-                            <aside id="commentary-area">
-                                <div id="commentary-messages">
-                                    <!-- 実況メッセージがここに表示される -->
-                                </div>
-                            </aside>
+                        <div id="board-wrapper">
+                            <div id="board" class="board">
+                                <!-- スロット1-9がJSで動的に生成される -->
+                            </div>
 
                             <!-- アクションボタン -->
                             <section id="actions-section">
@@ -63,6 +56,13 @@
                                 <button id="btn-cancel-placement" class="btn btn-warning" disabled>Cancel</button>
                             </section>
                         </div>
+
+                        <!-- 実況表示エリア -->
+                        <aside id="commentary-area">
+                            <div id="commentary-messages">
+                                <!-- 実況メッセージがここに表示される -->
+                            </div>
+                        </aside>
                     </section>
 
                     <!-- Player 2 Area (下部) -->

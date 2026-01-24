@@ -258,11 +258,11 @@ header #btn-new-game {
     gap: 1.5rem;
 }
 
-#right-panel {
+#board-wrapper {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
-    align-items: stretch;
+    gap: 1rem;
+    align-items: center;
 }
 
 .board {
@@ -474,9 +474,14 @@ header #btn-new-game {
    ======================================== */
 #actions-section {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 0.75rem;
-    width: 200px;
+    justify-content: center;
+}
+
+#actions-section .btn {
+    padding: 0.75rem 1rem;
+    width: 120px;
 }
 
 .btn {
@@ -744,16 +749,11 @@ header #btn-new-game {
         font-size: 0.6rem;
     }
 
-    #actions-section {
-        width: 100%;
-        flex-direction: row;
-    }
-
     #actions-section .btn {
         flex: 1;
     }
 
-    #right-panel {
+    #commentary-area {
         width: 100%;
     }
 }
