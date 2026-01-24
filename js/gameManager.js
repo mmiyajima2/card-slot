@@ -116,13 +116,6 @@
                 player2.hand.addCard(this.deck.draw());
             }
 
-            // Heavenly Hand判定
-            const heavenlyHandPlayer = this._checkHeavenlyHand();
-            if (heavenlyHandPlayer) {
-                this.endGame(heavenlyHandPlayer, "heavenly_hand");
-                return;
-            }
-
             // ゲーム開始イベント
             this.emit("gameStarted", {
                 players: this.players.map(p => ({
@@ -143,22 +136,6 @@
             if (this.isCPUTurn()) {
                 this._executeCPUTurn();
             }
-        }
-
-        /**
-         * Heavenly Hand判定
-         * @returns {Player|null} Heavenly Handを持つプレイヤー、いなければnull
-         */
-        _checkHeavenlyHand() {
-            for (const player of this.players) {
-                const gold7Count = player.hand.countBySymbol(SYMBOLS.RAINBOW_7);
-                const silver3Count = player.hand.countBySymbol(SYMBOLS.SILVER_3);
-
-                if (gold7Count === 5 && silver3Count === 5) {
-                    return player;
-                }
-            }
-            return null;
         }
 
         // ==================== ターン管理 ====================

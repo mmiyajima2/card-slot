@@ -154,14 +154,6 @@ A line is completed when three cards with the same symbol are aligned:
 4. Prepare a discard pile area
 5. Determine first player (rock-paper-scissors, etc.)
 
-### Miracle Hand - Ultra-Rare Instant Win
-
-If your starting hand consists of:
-- 5 Rainbow 7 cards
-- 5 Silver 3 cards
-
-You can declare "Miracle Hand" and win immediately! (This is astronomically unlikely)
-
 ---
 
 ## How to Play
@@ -372,9 +364,6 @@ When a line is completed, that card's effect activates.
 
 ### Q9. If I win with Rainbow 7 but my hand becomes empty?
 **A.** Rainbow 7 instant win takes priority. You win.
-
-### Q10. What's the probability of Miracle Hand?
-**A.** Astronomically low, but it exists within the rules.
 
 ---
 
