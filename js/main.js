@@ -45,7 +45,7 @@
         elements = {
             // ゲーム情報
             currentPlayer: document.getElementById('current-player'),
-            deckCount: document.getElementById('deck-count'),
+            deckCount: document.getElementById('deck-count-value'),
 
             // ボード
             board: document.getElementById('board'),
@@ -390,6 +390,7 @@
     /**
      * UIを更新（ゲーム状態に基づく）
      */
+    let previousDeckSize;
     function updateUI() {
         if (!gameManager) return;
 
@@ -397,7 +398,19 @@
 
         // ヘッダー情報更新
         elements.currentPlayer.textContent = `${state.currentPlayer}'s Turn`;
-        elements.deckCount.textContent = `Deck: ${state.deckSize}`;
+
+        // デッキ残数更新（アニメーション付き）
+        elements.deckCount.textContent = state.deckSize;
+
+        // デッキ残数変更時にアニメーションを追加
+        if (previousDeckSize !== undefined && previousDeckSize !== state.deckSize) {
+            const display = document.getElementById('deck-count-display');
+            if (display) {
+                display.classList.add('updated');
+                setTimeout(() => display.classList.remove('updated'), 600);
+            }
+        }
+        previousDeckSize = state.deckSize;
 
         // ボード更新
         updateBoard();

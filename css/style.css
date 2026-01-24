@@ -258,11 +258,74 @@ header #btn-new-game {
     gap: 1.5rem;
 }
 
-#right-panel {
+#board-wrapper {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
-    align-items: stretch;
+    gap: 1rem;
+    align-items: center;
+}
+
+/* Deck Info Display - Above Board */
+#deck-info {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 0.75rem;
+}
+
+#deck-count-display {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, var(--color-bg-light) 0%, var(--color-primary) 100%);
+    border: 2px solid var(--color-accent);
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(233, 69, 96, 0.3);
+    transition: all 0.3s ease;
+}
+
+#deck-count-display:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(233, 69, 96, 0.5);
+}
+
+.deck-label {
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: var(--color-accent);
+    letter-spacing: 1px;
+}
+
+#deck-count-value {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: var(--color-text);
+    min-width: 2.5ch;
+    text-align: center;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.deck-unit {
+    font-size: 0.75rem;
+    color: var(--color-text-dim);
+    font-style: italic;
+}
+
+/* Pulse animation when deck count changes */
+@keyframes deckUpdate {
+    0%, 100% {
+        transform: scale(1);
+        border-color: var(--color-accent);
+    }
+    50% {
+        transform: scale(1.05);
+        border-color: var(--color-success);
+        box-shadow: 0 6px 25px rgba(46, 204, 113, 0.6);
+    }
+}
+
+#deck-count-display.updated {
+    animation: deckUpdate 0.6s ease-in-out;
 }
 
 .board {
@@ -474,9 +537,14 @@ header #btn-new-game {
    ======================================== */
 #actions-section {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 0.75rem;
-    width: 200px;
+    justify-content: center;
+}
+
+#actions-section .btn {
+    padding: 0.75rem 1rem;
+    width: 120px;
 }
 
 .btn {
@@ -744,16 +812,29 @@ header #btn-new-game {
         font-size: 0.6rem;
     }
 
-    #actions-section {
-        width: 100%;
-        flex-direction: row;
-    }
-
     #actions-section .btn {
         flex: 1;
     }
 
-    #right-panel {
+    #commentary-area {
         width: 100%;
+    }
+
+    #deck-count-display {
+        padding: 0.4rem 0.75rem;
+        gap: 0.4rem;
+    }
+
+    .deck-label {
+        font-size: 0.75rem;
+    }
+
+    #deck-count-value {
+        font-size: 1.5rem;
+        min-width: 2ch;
+    }
+
+    .deck-unit {
+        font-size: 0.65rem;
     }
 }

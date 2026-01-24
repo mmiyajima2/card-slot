@@ -24,7 +24,7 @@ This repository contains the **game rules, implementation, and web deployment co
 - **3×3 Strategic Board:** Tactical placement with center slot importance
 - **Deck Management:** Draw, hand management, and discard pile mechanics
 - **Line Effect Resolution:** Choose which completed line to resolve
-- **REPLAY Mechanics:** Chain actions for additional card placements
+- **REPLAY Mechanics:** Discard up to 3 cards from the deck
 - **Rainbow 7 Victory:** Instant win condition with three Rainbow 7s in a line
 
 ---
