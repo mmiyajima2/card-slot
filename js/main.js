@@ -87,7 +87,13 @@
 
             // モーダル: ゲームモード選択
             gameModeModal: document.getElementById('game-mode-modal'),
-            btnStartGame: document.getElementById('btn-start-game')
+            btnStartGame: document.getElementById('btn-start-game'),
+
+            // モーダル: ゲーム終了確認
+            gameOverModal: document.getElementById('game-over-modal'),
+            gameOverMessage: document.getElementById('game-over-message'),
+            btnPlayAgain: document.getElementById('btn-play-again'),
+            btnCloseGameOver: document.getElementById('btn-close-game-over')
         };
     }
 
@@ -152,6 +158,12 @@
 
         // ゲーム開始ボタン（モーダル内）
         elements.btnStartGame.addEventListener('click', handleStartGameFromModal);
+
+        // ゲーム終了モーダル: Play Againボタン
+        elements.btnPlayAgain.addEventListener('click', handlePlayAgain);
+
+        // ゲーム終了モーダル: Closeボタン
+        elements.btnCloseGameOver.addEventListener('click', handleCloseGameOver);
     }
 
     /**
@@ -341,6 +353,8 @@
 
         // ゲーム終了イベント
         gameManager.on('gameEnded', (data) => {
+            let gameOverMessage = '';
+
             if (data.winner) {
                 const reasonMessages = {
                     'rainbow_7_line': 'Rainbow 7 Line completed',
@@ -357,18 +371,23 @@
                 switch (data.reason) {
                     case 'rainbow_7_line':
                         commentaryMessage = `🌈 Rainbow 7 Line!\n${data.winner} Wins!`;
+                        gameOverMessage = `${data.winner} wins!\n\nRainbow 7 Line completed!`;
                         break;
                     case 'opponent_eliminated':
                         commentaryMessage = `${data.winner} Wins!\nOpponent eliminated`;
+                        gameOverMessage = `${data.winner} wins!\n\nOpponent eliminated.`;
                         break;
                     case 'deck_empty_survival':
                         commentaryMessage = `${data.winner} Wins!\nLast player standing`;
+                        gameOverMessage = `${data.winner} wins!\n\nLast player standing.`;
                         break;
                     case 'deck_empty_score':
                         commentaryMessage = `${data.winner} Wins!\nHigher score`;
+                        gameOverMessage = `${data.winner} wins!\n\nHigher score.`;
                         break;
                     default:
                         commentaryMessage = `${data.winner} Wins!\n${reasonText}`;
+                        gameOverMessage = `${data.winner} wins!\n\n${reasonText}`;
                 }
                 showCommentary(commentaryMessage, 'victory');
 
@@ -378,8 +397,20 @@
                 // 引き分けの場合
                 showCommentary('Game Over\nDraw', 'draw');
                 addLogMessage(`Game Over! Draw (${data.reason})`, 'info');
+                gameOverMessage = 'Game Over!\n\nIt\'s a draw.';
             }
+
             updateUI();
+
+            // Google Analyticsにゲーム完了イベントを送信
+            if (globalThis.CardSlot && globalThis.CardSlot.Analytics) {
+                const winner = data.winner || 'draw';
+                const gameMode = gameManager.gameConfig.mode || 'solo';
+                globalThis.CardSlot.Analytics.trackGameCompleted(winner, data.reason, gameMode);
+            }
+
+            // ゲーム終了確認モーダルを表示
+            showGameOverModal(gameOverMessage);
         });
     }
 
@@ -1266,6 +1297,46 @@
     function handleCancelDiscard() {
         hideDiscardConfirmDialog();
         addLogMessage('Discard cancelled', 'info');
+    }
+
+    /**
+     * ゲーム終了モーダルを表示
+     * @param {string} message - ゲーム終了メッセージ
+     */
+    function showGameOverModal(message) {
+        elements.gameOverMessage.textContent = message;
+        elements.gameOverModal.style.display = 'flex';
+    }
+
+    /**
+     * ゲーム終了モーダルを非表示
+     */
+    function hideGameOverModal() {
+        elements.gameOverModal.style.display = 'none';
+    }
+
+    /**
+     * Play Againボタンハンドラ
+     */
+    function handlePlayAgain() {
+        // Google Analyticsに再プレイイベントを送信
+        if (globalThis.CardSlot && globalThis.CardSlot.Analytics) {
+            const gameMode = gameManager.gameConfig.mode || 'solo';
+            globalThis.CardSlot.Analytics.trackPlayAgain(gameMode);
+        }
+
+        // モーダルを閉じる
+        hideGameOverModal();
+
+        // 新しいゲームを開始
+        handleNewGame();
+    }
+
+    /**
+     * Close Game Overボタンハンドラ
+     */
+    function handleCloseGameOver() {
+        hideGameOverModal();
     }
 
     /**

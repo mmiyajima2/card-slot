@@ -47,12 +47,42 @@
         });
     }
 
+    /**
+     * Game Completedイベントを送信
+     * @param {string} winner - 勝者名（またはdraw）
+     * @param {string} reason - 勝利理由
+     * @param {string} gameMode - ゲームモード（solo/cpu）
+     */
+    function trackGameCompleted(winner, reason, gameMode) {
+        sendGAEvent('game_completed', {
+            event_category: 'game',
+            event_label: 'game_finished',
+            winner: winner,
+            win_reason: reason,
+            game_mode: gameMode
+        });
+    }
+
+    /**
+     * Play Againイベントを送信
+     * @param {string} gameMode - ゲームモード（solo/cpu）
+     */
+    function trackPlayAgain(gameMode) {
+        sendGAEvent('play_again', {
+            event_category: 'game',
+            event_label: 'play_again_button_clicked',
+            game_mode: gameMode
+        });
+    }
+
     // グローバルに公開
     if (!globalThis.CardSlot) {
         globalThis.CardSlot = {};
     }
     globalThis.CardSlot.Analytics = {
         trackNewGame: trackNewGame,
+        trackGameCompleted: trackGameCompleted,
+        trackPlayAgain: trackPlayAgain,
         sendEvent: sendGAEvent,
         isProduction: isProductionEnvironment
     };
