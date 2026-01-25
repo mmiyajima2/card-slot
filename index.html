@@ -174,6 +174,20 @@
                     </div>
                 </div>
             </div>
+
+            <!-- モーダル: ゲーム終了確認 -->
+            <div id="game-over-modal" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <h3>Game Over</h3>
+                    <p id="game-over-message">
+                        <!-- 動的に生成: 勝敗と理由 -->
+                    </p>
+                    <div class="modal-actions">
+                        <button id="btn-play-again" class="btn btn-primary">Play Again</button>
+                        <button id="btn-close-game-over" class="btn btn-secondary">Close</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- JavaScriptファイルの読み込み（順序重要） -->
@@ -186,7 +200,7 @@
         <script src="js/lineEffectResolver.js?v=2"></script>
         <script src="js/cpuAI.js?v=1"></script>
         <script src="js/gameManager.js?v=5"></script>
-        <script src="js/analytics.js?v=1"></script>
-        <script src="js/main.js?v=8"></script>
+        <script src="js/analytics.js?v=2"></script>
+        <script src="js/main.js?v=9"></script>
     </body>
 </html>
